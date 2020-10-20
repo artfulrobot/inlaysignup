@@ -1,0 +1,81 @@
+<div class="crm-container">
+  <h1 crm-page-title>{{ ts('Edit %1', {1: inlayType.name })}}</h1>
+
+  <pre>{{ inlay |json }}</pre>
+  <form name="inlayForm" crm-ui-id-scope>
+
+    <!--
+    <div class="help">
+      <p>{{ts('To view more debugging information, edit the URL and include "?angularDebug=1".')}}</p>
+    </div>
+    -->
+
+    <div crm-ui-field="{name: 'inlayForm.name', title: ts('Name'), help: hs('full_name')}">
+      <input
+        crm-ui-id="inlayForm.name"
+        name="name"
+        ng-model="inlay.name"
+        class="crm-form-text"
+        placeholder="{{ts('Our lovely signup form')}}"
+        />
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.mailingGroup', title: ts('Mailing Group to add contact to')}">
+      <select
+        crm-ui-id="inlayForm.mailingGroup"
+        name="mailingGroup"
+        ng-model="inlay.config.mailingGroup"
+        class="crm-form-select"
+        ng-options="g.id as g.title for g in mailingGroups"
+        />
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.signupButtonText', title: ts('Signup button text')}">
+      <input
+        crm-ui-id="inlayForm.signupButtonText"
+        name="signupButtonText"
+        ng-model="inlay.config.signupButtonText"
+        class="crm-form-text"
+        placeholder="{{ts('e.g. Sign up')}}"
+        />
+    </div>
+
+    <!--
+    <pre>{{ inlay.config | json }}</pre>
+    <div crm-ui-accordion="{title: ts('Greeting')}">
+      <p ng-show="$ctrl.myContact.first_name">{{ ts('Hello, %1.', {1: $ctrl.myContact.first_name}) }}</p>
+
+      <p ng-show="!$ctrl.myContact.first_name">{{ ts('Hello, stranger.') }}</p>
+    </div>
+
+    <div crm-ui-accordion="{title: ts('About Me')}">
+      <div class="crm-block">
+        <div class="crm-group">
+          <div crm-ui-field="{name: 'myForm.first_name', title: ts('Name'), help: hs('full_name')}">
+            <input
+              crm-ui-id="myForm.first_name"
+              name="first_name"
+              ng-model="$ctrl.myContact.first_name"
+              class="crm-form-text"
+              placeholder="{{ts('First')}}"
+              />
+            <input
+              crm-ui-id="myForm.last_name"
+              name="last_name"
+              ng-model="$ctrl.myContact.last_name"
+              class="crm-form-text"
+              placeholder="{{ts('Last')}}"
+              />
+          </div>
+        </div>
+      </div>
+      -->
+
+      <div>
+        <button ng-click="save()">{{ts('Save')}}</button>
+      </div>
+    </div>
+
+  </form>
+
+</div>

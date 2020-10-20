@@ -8,7 +8,17 @@ class InlaySignup extends InlayType {
 
   public static $typeName = 'Signup form';
 
-  public static $editURLTemplate = 'civicrm/a#/inlays/signupForm/{id}';
+  public static $defaultConfig = [
+    'signupButtonText' => 'Sign up',
+    'mailingGroup'     => NULL,
+  ];
+
+  /**
+   * Note: because of the way CRM.url works, you MUST put a ? before the #
+   *
+   * @var string
+   */
+  public static $editURLTemplate = 'civicrm/a?#/inlays/signup/{id}';
 
   /**
    * Sets the config ensuring it's valid.
@@ -22,7 +32,7 @@ class InlaySignup extends InlayType {
    * @return \Civi\Inlay\Type (this)
    */
   public function setConfig(array $config) {
-
+    $this->config = array_intersect_key($config + $this->defaultConfig, $this->defaultConfig);
   }
 
   /**
