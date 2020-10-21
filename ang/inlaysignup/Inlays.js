@@ -16,7 +16,15 @@
                 select: ["id", "title"],
                 where: [["group_type", "=", 2], ["is_active", "=", true], ["is_hidden", "=", false]],
                 orderBy: {"title":"ASC"}
-              }]
+              }],
+              messageTpls: [ 'MessageTemplate', 'get', {
+                select: ["id", "msg_title", "msg_subject"],
+                where: [
+                  ["is_active", "=", true], ["is_sms", "=", false],
+                  ["workflow_id", "IS NULL"]
+                ],
+                orderBy: {msg_title: 'ASC'}},
+                'id']
             };
             if ($route.current.params.id > 0) {
               params.inlay = ['Inlay', 'get', {where: [["id", "=", $route.current.params.id]]}, 0];
@@ -40,6 +48,7 @@
     $scope.inlayType = various.inlayTypes['Civi\\Inlay\\InlaySignup'];
     console.log({various}, $scope.inlayType);
     $scope.mailingGroups = various.groups;
+    $scope.messageTpls = various.messageTpls;
     if (various.inlay) {
       $scope.inlay = various.inlay;
     }

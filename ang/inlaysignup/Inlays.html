@@ -1,7 +1,6 @@
 <div class="crm-container">
   <h1 crm-page-title>{{ ts('Edit %1', {1: inlayType.name })}}</h1>
 
-  <pre>{{ inlay |json }}</pre>
   <form name="inlayForm" crm-ui-id-scope>
 
     <!--
@@ -22,12 +21,24 @@
 
     <div crm-ui-field="{name: 'inlayForm.mailingGroup', title: ts('Mailing Group to add contact to')}">
       <select
-        crm-ui-id="inlayForm.mailingGroup"
-        name="mailingGroup"
+        crm-ui-select="{placeholder:'Something',allowClear:true, dropdownAutoWidth: true}"
         ng-model="inlay.config.mailingGroup"
-        class="crm-form-select"
-        ng-options="g.id as g.title for g in mailingGroups"
-        />
+        name="mailingGroup"
+        style="width: 100%"
+        >
+        <option ng-repeat="g in mailingGroups"
+                ng-value="g.id">{{g.title}}</option>
+      </select>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.smallprintHTML', title: ts('Text by submit button, e.g. explaining GDPR')}">
+      <textarea
+        crm-ui-id="inlayForm.smallprintHTML"
+        crm-ui-richtext
+        name="smallprintHTML"
+        ng-model="inlay.config.smallprintHTML"
+        class="crm-form-text"
+        ></textarea>
     </div>
 
     <div crm-ui-field="{name: 'inlayForm.signupButtonText', title: ts('Signup button text')}">
@@ -38,6 +49,28 @@
         class="crm-form-text"
         placeholder="{{ts('e.g. Sign up')}}"
         />
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.welcomeEmailID', title: ts('Welcome email to send')}">
+      <select
+        crm-ui-select="{allowClear:true, dropdownAutoWidth: true}"
+        name="welcomeEmailID"
+        style="width: 100%"
+        ng-model="inlay.config.welcomeEmailID"
+        >
+        <option value="">(Do not send an email)</option>
+        <option ng-repeat="i in messageTpls" ng-value="i.id">{{i.msg_title}} ({{i.msg_subject}})<option>
+      </select>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.webThanksHTML', title: ts('Thank you text for website')}">
+      <textarea
+        crm-ui-id="inlayForm.webThanksHTML"
+        crm-ui-richtext
+        name="webThanksHTML"
+        ng-model="inlay.config.webThanksHTML"
+        class="crm-form-text"
+        ></textarea>
     </div>
 
     <!--

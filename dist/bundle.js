@@ -52,10 +52,11 @@
               />
           </div>
           <div class="is-buttons">
+            <div class="is-smallprint" ></div>
             <button class="is-submit" />
           </div>
         </form>
-        <div class="is-thanks">Thank you. Please add us to your addressbook and fish our email out of your spam folder if it ends up there!</div>
+        <div class="is-thanks is-locator">Thank you.</div>
       </div>
       `;
       const nodes = {
@@ -64,12 +65,15 @@
         firstNameInput: signupAppDiv.querySelector('input[name="first_name"]'),
         lastNameInput: signupAppDiv.querySelector('input[name="last_name"]'),
         submitButton: signupAppDiv.querySelector('button.is-submit'),
+        smallprint: signupAppDiv.querySelector('.is-smallprint'),
         thanks: signupAppDiv.querySelector('.is-thanks'),
         form: signupAppDiv.querySelector('form')
       };
       console.log({signupAppDiv, nodes});
       nodes.thanks.style.display = 'none';
       nodes.submitButton.textContent = inlay.initData.signupButtonText;
+      nodes.thanks.innerHTML = inlay.initData.webThanksHTML;
+      nodes.smallprint.innerHTML = inlay.initData.smallprintHTML;
       const allInputs = ['emailInput', 'firstNameInput', 'lastNameInput'].map(i => nodes[i]);
 
       var isActive = false;
@@ -103,10 +107,18 @@
         allInputs.forEach(i => { i.value = ''; i.classList.add('pre-interaction'); i.parentNode.classList.remove('invalid'); });
         // replace the node.
         inlay.script.insertAdjacentElement('afterend', signupAppDiv);
+        nodes.form.style.display = '';
+        nodes.thanks.style.display = 'none';
+        nodes.submitButton.textContent = inlay.initData.signupButtonText;
+        nodes.submitButton.disabled = false;
       };
       nodes.overlay.addEventListener('click', function(e) {
         if (this === e.target) {
-          console.log('reset firing', this, e);
+          // Reset if clicked directly, but ignore bubbling clicks from child elements.
+          reset(e);
+        }});
+      nodes.thanks.addEventListener('click', function(e) {
+        if (this === e.target) {
           // Reset if clicked directly, but ignore bubbling clicks from child elements.
           reset(e);
         }});
@@ -158,10 +170,17 @@
     var styles = `
     .inlay-signup.at-rest .first_name,
     .inlay-signup.at-rest .last_name,
+    .inlay-signup.at-rest .is-smallprint,
     .inlay-signup.at-rest label {
       display:none;
     }
-
+    .inlay-signup.focussed .is-field {
+      margin-bottom: 1rem;
+    }
+    .inlay-signup.focussed .is-field input {
+      box-sizing:border-box;
+      width: 100%;
+    }
     .inlay-signup.at-rest .email,
     .inlay-signup.at-rest .is-buttons {
       display:inline-block;
@@ -182,16 +201,20 @@
       align-items: center;
     }
     .inlay-signup.focussed .is-locator {
-      max-width: 50rem;
+      max-width: 30rem;
       background: #662a73;
       color: white;
       padding: 2rem;
       border-radius: 1rem;
     }
+    .is-thanks {
+      font-size: 1.6rem;
+      text-align: center;
+    }
     .inlay-signup.focussed label {
       display: block;
     }
-    .inlay-signup.focussed is-buttons button {
+    .inlay-signup.focussed .is-buttons button {
       width: 100%;
     }
     body.inlay-signup-modal-active {
