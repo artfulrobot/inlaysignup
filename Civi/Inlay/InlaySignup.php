@@ -3,6 +3,7 @@
 namespace Civi\Inlay;
 
 use Civi\Inlay\Type as InlayType;
+use Civi\Inlay\ApiRequest;
 use CRM_Inlaysignup_ExtensionUtil as E;
 
 class InlaySignup extends InlayType {
@@ -52,10 +53,13 @@ class InlaySignup extends InlayType {
   /**
    * Process a request
    *
+   * @param \Civi\Inlay\Request $request
    * @return array
    */
-  public function processRequest($request) {
-
+  public function processRequest(ApiRequest $request) {
+    return [
+      'error' => 'Might be ok, but not written yet'
+    ];
   }
 
   /**

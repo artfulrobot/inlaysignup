@@ -183,7 +183,8 @@
     }
     .inlay-signup.focussed .is-locator {
       max-width: 50rem;
-      background: #f33;
+      background: #662a73;
+      color: white;
       padding: 2rem;
       border-radius: 1rem;
     }
