@@ -3,6 +3,7 @@
 namespace Civi\Inlay;
 
 use Civi\Inlay\Type as InlayType;
+use CRM_Inlaysignup_ExtensionUtil as E;
 
 class InlaySignup extends InlayType {
 
@@ -32,7 +33,7 @@ class InlaySignup extends InlayType {
    * @return \Civi\Inlay\Type (this)
    */
   public function setConfig(array $config) {
-    $this->config = array_intersect_key($config + $this->defaultConfig, $this->defaultConfig);
+    $this->config = array_intersect_key($config + static::$defaultConfig, static::$defaultConfig);
   }
 
   /**
@@ -41,7 +42,11 @@ class InlaySignup extends InlayType {
    * @return array
    */
   public function getInitData() {
-
+    return [
+      // Name of global Javascript function used to boot this app.
+      'init' => 'inlaySignupInit',
+      'signupButtonText' => $this->config['signupButtonText'],
+    ];
   }
 
   /**
@@ -71,7 +76,7 @@ class InlaySignup extends InlayType {
    * @return string Content of a Javascript file.
    */
   public function getExternalScript() {
-
+    return file_get_contents(E::path('dist/bundle.js'));
   }
 
 }
