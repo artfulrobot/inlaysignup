@@ -59,6 +59,10 @@ class InlaySignup extends InlayType {
   /**
    * Process a request
    *
+   * Request data is just key, value pairs from the form data. If it does not
+   * have 'token' field then a token is generated and returned. Otherwise the
+   * token is checked and processing continues.
+   *
    * @param \Civi\Inlay\Request $request
    * @return array
    *
@@ -67,6 +71,11 @@ class InlaySignup extends InlayType {
   public function processRequest(ApiRequest $request) {
 
     $data = $this->cleanupInput($request->getBody());
+
+    if (empty($data['token'])) {
+      // Unsigned request. Issue a token that will be valid in 5s time and lasts 2mins max.
+      return ['token' => $this->getCSRFToken(['data' => $data, 'validFrom' => 5, 'validTo' => 120])];
+    }
 
     // Find Contact with XCM.
     $params = $data + ['contact_type' => 'Individual'];
@@ -138,10 +147,27 @@ class InlaySignup extends InlayType {
         }
       }
     }
-
     if ($errors) {
       throw new \Civi\Inlay\ApiException(400, implode(', ', $errors));
     }
+
+    // Data is valid.
+    if (!empty($data['token'])) {
+      // There is a token, check that now.
+      try {
+        $this->checkCSRFToken($data['token'], $valid);
+        $valid['token'] = TRUE;
+      }
+      catch (\InvalidArgumentException $e) {
+        // Token failed. Issue a public friendly message, though this should
+        // never be seen by anyone legit.
+        Civi::log()->notice("Token error: " . $e->getMessage . "\n" . $e->getTraceAsString());
+        watchdog('inlay', $e->getMessage() . "\n" . $e->getTraceAsString, array(), WATCHDOG_ERROR);
+        throw new \Civi\Inlay\ApiException(400,
+          "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3));
+      }
+    }
+
 
     return $valid;
   }
@@ -231,4 +257,3 @@ class InlaySignup extends InlayType {
   }
 
 }
-

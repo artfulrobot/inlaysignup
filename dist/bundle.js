@@ -53,7 +53,8 @@
           </div>
           <div class="is-buttons">
             <div class="is-smallprint" ></div>
-            <button class="is-submit" />
+            <button class="is-submit" ></button>
+            <div class="is-progress"></div>
           </div>
         </form>
         <div class="is-thanks is-locator">Thank you.</div>
@@ -67,6 +68,7 @@
         submitButton: signupAppDiv.querySelector('button.is-submit'),
         smallprint: signupAppDiv.querySelector('.is-smallprint'),
         thanks: signupAppDiv.querySelector('.is-thanks'),
+        progress: signupAppDiv.querySelector('.is-progress'),
         form: signupAppDiv.querySelector('form')
       };
       console.log({signupAppDiv, nodes});
@@ -104,7 +106,7 @@
         signupAppDiv.classList.add('at-rest');
         signupAppDiv.classList.remove('focussed');
         document.body.classList.remove('inlay-signup-modal-active');
-        allInputs.forEach(i => { i.value = ''; i.classList.add('pre-interaction'); i.parentNode.classList.remove('invalid'); });
+        allInputs.forEach(i => { i.value = ''; i.classList.add('pre-interaction'); i.parentNode.classList.remove('invalid'); i.reset && i.reset(); });
         // replace the node.
         inlay.script.insertAdjacentElement('afterend', signupAppDiv);
         nodes.form.style.display = '';
@@ -112,6 +114,7 @@
         nodes.submitButton.textContent = inlay.initData.signupButtonText;
         nodes.submitButton.disabled = false;
       };
+
       nodes.overlay.addEventListener('click', function(e) {
         if (this === e.target) {
           // Reset if clicked directly, but ignore bubbling clicks from child elements.
@@ -138,6 +141,75 @@
         allInputs.forEach(i => handleInputInterraction);
       });
 
+      function getFormData(token) {
+        const d = {
+            email: nodes.emailInput.value,
+            first_name: nodes.firstNameInput.value,
+            last_name: nodes.lastNameInput.value,
+          };
+        if (token) {
+          d.token = token;
+        }
+        return d;
+      }
+
+      var progress = {
+        doneBefore:0,
+        jobTotal:100,
+        expectedTime: null,
+        percent: 0,
+        start: null,
+      };
+      function animateTimer(t) {
+        if (!progress.start) {
+          progress.start = t;
+        }
+        const linear = Math.min(1, (t - progress.start) / progress.expectedTime);
+        const easeout = 1 - (1-linear) * (1-linear) * (1-linear);
+        progress.percent = progress.doneBefore + easeout * (progress.percentDoneAtEndOfJob - progress.doneBefore);
+
+        nodes.progress.style.width = progress.percent + '%';
+        if (progress.running && (linear < 1)) {
+          window.requestAnimationFrame(animateTimer);
+        }
+        else {
+          progress.running = false;
+        }
+      }
+
+      function startTimer(expectedTime, percentDoneAtEndOfJob, reset) {
+        expectedTime = expectedTime * 1000;
+        if (reset) {
+          progress = {
+            doneBefore:0,
+            percentDoneAtEndOfJob,
+            expectedTime: expectedTime,
+            percent: 0,
+            start: null,
+            running: false
+          };
+          // Start animation.
+          nodes.progress.classList.add('active');
+        }
+        else {
+          // Adding a job.
+          progress.doneBefore = progress.percent;
+          progress.start = null;
+          progress.expectedTime = expectedTime;
+          progress.percentDoneAtEndOfJob = percentDoneAtEndOfJob;
+        }
+        if (!progress.running) {
+          // Start animation.
+          progress.running = true;
+          window.requestAnimationFrame(animateTimer)
+        }
+      }
+      window.cancelTimer = function cancelTimer() {
+        progress.start = null;
+        progress.running = false;
+        nodes.progress.classList.remove('active');
+      }
+
       nodes.form.addEventListener('submit', e => {
         console.log('submitted and valid');
         e.preventDefault();
@@ -145,18 +217,45 @@
 
         nodes.submitButton.disabled = true;
         nodes.submitButton.textContent = 'Just a mo...';
+        // Expect it to take 2s to do first 20%
+        startTimer(2, 20, 1);
 
-        inlay.request({
-          method: 'post',
-          body: {
-            email: nodes.emailInput.value,
-            first_name: nodes.firstNameInput.value,
-            last_name: nodes.lastNameInput.value,
-          }
-        })
+        function cancelSubmission() {
+          nodes.submitButton.disabled = false;
+          nodes.submitButton.textContent = inlay.initData.signupButtonText;
+          cancelTimer();
+        }
+
+        inlay.request({ method: 'post', body: getFormData() })
         .then(r => {
-          nodes.form.style.display = 'none';
-          nodes.thanks.style.display = '';
+          console.log(r);
+          if (r.error) {
+            alert("Sorry, there was a problem with the form: " + r.error);
+            cancelSubmission();
+          }
+          else if (r.token) {
+            console.log("Token received, waiting 5s");
+            // Expect it to take 6s to get to 80% though we'll be done in 5.
+            startTimer(6, 80);
+            setTimeout(() => {
+              console.log("Sending 2nd request, with token");
+              // Expect it to take 2s to get to 100%
+              startTimer(2, 100);
+              inlay.request({ method: 'post', body: getFormData(r.token) })
+              .then(r => {
+                if (r.success) {
+                  cancelTimer();
+                  nodes.form.style.display = 'none';
+                  nodes.thanks.style.display = '';
+                }
+                else {
+                  alert("Sorry, there was a problem with the form: " + (r.error || 'unknown error'));
+                  cancelSubmission();
+                  return;
+                }
+              });
+            }, 5000);
+          }
         });
       });
 
@@ -211,6 +310,14 @@
       font-size: 1.6rem;
       text-align: center;
     }
+    .inlay-signup .is-progress {
+      height: 2px;
+      margin-top:0.25rem;
+      background-color: transparent;
+    }
+    .inlay-signup .is-progress.active {
+      background-color: white;
+    }
     .inlay-signup.focussed label {
       display: block;
     }
@@ -221,6 +328,7 @@
       position: fixed;
       overflow: hidden;
     }
+
 
 `
     var styleSheet = document.createElement("style")
