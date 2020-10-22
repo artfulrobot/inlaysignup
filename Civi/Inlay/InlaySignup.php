@@ -117,7 +117,7 @@ class InlaySignup extends InlayType {
     // but it's crude and does not allow for a subset of groups.
 
     // Send welcome mailing.
-    $this->sendWelcomeEmail($contactID);
+    $this->sendWelcomeEmail($contactID, $data);
 
     return [ 'success' => 1 ];
   }
@@ -172,7 +172,7 @@ class InlaySignup extends InlayType {
     return $valid;
   }
 
-  public function sendWelcomeEmail($contactID) {
+  public function sendWelcomeEmail($contactID, $valid) {
     if (!$this->config['welcomeEmailID']) {
       return;
     }
