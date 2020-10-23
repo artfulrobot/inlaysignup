@@ -25,40 +25,41 @@
       signupAppDiv.classList.add('inlay-signup', 'i' + inlay.publicID, 'at-rest');
       signupAppDiv.innerHTML = `
       <div class="is-overlay">
-        <form class="is-locator" action='#' >
+        <div class="is-locator">
           <button class="is-close" title="Close this form">×</button>
-          <div class="is-field email">
-            <label>Email</label>
-            <input
-              name="email"
-              type="email"
-              placeholder="youremail@example.org"
-              required
-              />
-          </div>
-          <div class="is-field first_name">
-            <label>First name</label>
-            <input
-              name="first_name"
-              type="text"
-              required
-              />
-          </div>
-          <div class="is-field last_name">
-            <label>Last name</label>
-            <input
-              name="last_name"
-              type="text"
-              required
-              />
-          </div>
-          <div class="is-buttons">
-            <div class="is-smallprint" ></div>
-            <button class="is-submit" ></button>
-            <div class="is-progress"></div>
-          </div>
-        </form>
-        <div class="is-thanks is-locator">Thank you.</div>
+          <form action='#' >
+            <div class="is-field email">
+              <label>Email</label>
+              <input
+                name="email"
+                type="email"
+                placeholder="youremail@example.org"
+                required
+                />
+            </div>
+            <div class="is-field first_name">
+              <label>First name</label>
+              <input
+                name="first_name"
+                type="text"
+                required
+                />
+            </div>
+            <div class="is-field last_name">
+              <label>Last name</label>
+              <input
+                name="last_name"
+                type="text"
+                required
+                />
+            </div>
+            <div class="is-buttons">
+              <div class="is-smallprint" ></div>
+              <button class="is-submit" ></button>
+              <div class="is-progress"></div>
+            </div>
+          </form>
+          <div class="is-thanks">Thank you.</div>
       </div>
       `;
       const nodes = {
@@ -103,7 +104,7 @@
         }
       };
 
-      const reset = e => {
+      const reset = () => {
         isActive = false;
         signupAppDiv.classList.add('at-rest');
         signupAppDiv.classList.remove('focussed');
@@ -117,15 +118,11 @@
         nodes.submitButton.disabled = false;
       };
 
-      // Provide ways to reset.
-      const resetOnClick = function(e) {
-        if (this === e.target) {
-          // Reset if clicked directly, but ignore bubbling clicks from child elements.
-          reset(e);
-        }};
-      nodes.overlay.addEventListener('click', resetOnClick);
-      nodes.thanks.addEventListener('click', resetOnClick);
-      nodes.closeButton.addEventListener('click', resetOnClick);
+      nodes.overlay.addEventListener('click', function(e) {
+        if (this === e.target) reset();
+      } );
+      nodes.thanks.addEventListener('click', reset);
+      nodes.closeButton.addEventListener('click', reset);
 
       // Initial state: don't show validation errors.
       allInputs.forEach(i => {
