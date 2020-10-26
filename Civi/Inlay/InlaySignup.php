@@ -82,7 +82,7 @@ class InlaySignup extends InlayType {
     $contactID = civicrm_api3('Contact', 'getorcreate', $params)['id'] ?? NULL;
     if (!$contactID) {
       Civi::log()->error('Failed to getorcreate contact with params: ' . json_encode($params));
-      throw new \Civi\Inlay\ApiException(500, 'Server error: XCM1');
+      throw new \Civi\Inlay\ApiException(500, ['error' => 'Server error: XCM1']);
     }
 
     // Ensure this email is their Bulk Mail one.
@@ -148,7 +148,7 @@ class InlaySignup extends InlayType {
       }
     }
     if ($errors) {
-      throw new \Civi\Inlay\ApiException(400, implode(', ', $errors));
+      throw new \Civi\Inlay\ApiException(400, ['error' => implode(', ', $errors)]);
     }
 
     // Data is valid.
@@ -164,7 +164,7 @@ class InlaySignup extends InlayType {
         Civi::log()->notice("Token error: " . $e->getMessage . "\n" . $e->getTraceAsString());
         watchdog('inlay', $e->getMessage() . "\n" . $e->getTraceAsString, array(), WATCHDOG_ERROR);
         throw new \Civi\Inlay\ApiException(400,
-          "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3));
+          ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]);
       }
     }
 
