@@ -7,17 +7,12 @@ return [
     'ang/inlaysignup.js',
     'ang/inlaysignup/*.js',
     'ang/inlaysignup/*/*.js',
-    'ang/inlaycontact.js',
-    'ang/inlaycontact/*.js',
-    'ang/inlaycontact/*/*.js',
   ],
   'css' => [
     'ang/inlaysignup.css',
-    'ang/inlaycontact.css',
   ],
   'partials' => [
     'ang/inlaysignup',
-    'ang/inlaycontact',
   ],
   'requires' => [
     'crmUi',
