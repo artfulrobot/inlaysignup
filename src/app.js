@@ -74,7 +74,6 @@
         progress: signupAppDiv.querySelector('.is-progress'),
         form: signupAppDiv.querySelector('form')
       };
-      console.log({signupAppDiv, nodes});
       nodes.thanks.style.display = 'none';
       nodes.submitButton.textContent = inlay.initData.signupButtonText;
       nodes.thanks.innerHTML = inlay.initData.webThanksHTML;
