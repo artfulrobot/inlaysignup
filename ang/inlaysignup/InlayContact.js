@@ -47,7 +47,7 @@
     // Local variable for this controller (needed when inside a callback fn where `this` is not available).
     var ctrl = this;
 
-    $scope.inlayType = various.inlayTypes['Civi\\Inlay\\InlaySignup'];
+    $scope.inlayType = various.inlayTypes['Civi\\Inlay\\Contact'];
     console.log({various}, $scope.inlayType);
     $scope.mailingGroups = various.groups;
     $scope.messageTpls = various.messageTpls;
@@ -56,7 +56,7 @@
     }
     else {
       $scope.inlay = {
-        'class' : 'Civi\\Inlay\\InlaySignup',
+        'class' : 'Civi\\Inlay\\Contact',
         name: 'New ' + $scope.inlayType.name,
         public_id: 'new',
         id: 0,

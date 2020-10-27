@@ -13,14 +13,16 @@ class Contact extends InlayType {
 
   public static $defaultConfig = [
     'submitButtonText' => 'Send',
+    'publicTitle'      => '',
     'smallprintHTML'   => NULL,
     'webThanksHTML'    => NULL,
-    'incPhone'         => TRUE,
-    'incEmail'         => TRUE,
-    'incUniversity'    => FALSE,
-    'incGroup'         => FALSE,
-    'assignTo'         => FALSE,
-    'notifyEmail'      => NULL,
+    'defaultMessage'   => NULL,
+    'instructionsHTML' => '',
+    'uniAsk'           => '', // ZLS or a label_a for a relationship type
+    'groupAsk'         => '', // ZLS or a label_a for a relationship type
+    'phoneAsk'         => TRUE,
+    'assignee'         => NULL,
+    // 'notifyEmail'      => NULL,
   ];
 
   /**
@@ -54,17 +56,17 @@ class Contact extends InlayType {
     $data = [
       // Name of global Javascript function used to boot this app.
       'init'             => 'inlayContactInit',
-      'submitButtonText' => $this->config['submitButtonText'],
-      'webThanksHTML'    => $this->config['webThanksHTML'],
-      'smallprintHTML'   => $this->config['smallprintHTML'],
-      'incPhone'         => $this->config['incPhone'],
-      'incEmail'         => $this->config['incEmail'],
-      'incUniversity'    => $this->config['incUniversity'],
-      'incGroup'         => $this->config['incGroup'],
     ];
+    foreach ([
+      'submitButtonText', 'publicTitle', 'smallprintHTML', 'webThanksHTML', 'defaultMessage', 'instructionsHTML', 'uniAsk', 'phoneAsk', 'groupAsk'
+    ] as $_) {
+      $data[$_] = $this->config[$_] ?? '';
+    }
 
     // @todo if incGroup, list them.
-    // @todo if incUni, list them.
+    if ($this->config['uniAsk']) {
+      $data['unis'] = $this->getUnis();
+    }
 
     return $data;
   }
@@ -98,9 +100,50 @@ class Contact extends InlayType {
       throw new \Civi\Inlay\ApiException(500, ['error' => 'Server error: XCM1']);
     }
 
-    // ? \CRM_Gdpr_SLA_Utils::recordSLAAcceptance($contactID);
+    // Require 'contactform1' form processor.
+    try {
+      $formProcessor = civicrm_api3('FormProcessorInstance', 'getsingle', [
+        'name' => 'contactform1',
+      ]);
+    }
+    catch (\Exception $e) {
+      Civi::log()->error('Failed to find "contactform1" FormProcessorInstance', ['exception' => $e]);
+      throw new \Civi\Inlay\ApiException(500, ['error' => 'Server error: ICF1']);
+    }
 
-    // @todo create activity
+    // Verbose list of data for clarity.
+    $fpData = [
+      'email'      => $data['email'],
+      'first_name' => $data['first_name'],
+      'last_name'  => $data['last_name'],
+      'message'    => $data['message'],
+    ];
+    if ($this->config['phoneAsk'] && !empty($data['phone'])) {
+      $fpData['phone'] = $data['phone'];
+    }
+    if ($this->config['uniAsk'] && !empty($data['uni'])) {
+      $fpData['university_contact_id'] = $data['uni'];
+    }
+    if (!empty($this->config['assignee'])) {
+      $fpData['activity_assignee'] = $this->config['assignee'];
+    }
+
+    // Create the activity details.
+    $fpData['activity_subject'] = $this->getName() . " (website contact form)";
+    $fpData['activity_details'] = "<p>We received the following message:</p>\n<blockquote><p>"
+      . preg_replace('/[\r\n]+/', '</p><p>', htmlspecialchars($data['message']))
+      . '</p></blockquote><p>Details provided:</p><ul>';
+    foreach (['email', 'first_name', 'last_name', 'phone'] as $_) {
+      if ($_) {
+        $fpData['activity_details'] .= '<li>' . ucfirst(str_replace('_', ' ', $_)) . ': ' . htmlspecialchars($data[$_]) . '</li>';
+      }
+    }
+    $fpData['activity_details'] .= '</ul>';
+    $fpData['activity_details'] .= '<pre>'  . htmlspecialchars(json_encode($data, JSON_PRETTY_PRINT)) . '</pre>';
+
+    // Use the Form Processor to process it.
+    $result = civicrm_api3('FormProcessor', 'contactform1', $fpData);
+
     // @todo email activity
 
     return [ 'success' => 1 ];
@@ -109,13 +152,23 @@ class Contact extends InlayType {
   /**
    * Validate and clean up input data.
    *
+   * Possible outputs:
+   * - first_name
+   * - last_name
+   * - email
+   * - message
+   * - token TRUE|unset
+   *
    * @param array $data
    *
    * @return array
    */
   public function cleanupInput($data) {
+    /** @var Array errors in this array, it will later be converted to a string. */
     $errors = [];
+    /** @var Array Collect validated data in this array */
     $valid = [];
+
     // Check we have what we need.
     foreach (['first_name', 'last_name', 'email', 'message'] as $field) {
       $val = trim($data[$field] ?? '');
@@ -146,9 +199,32 @@ class Contact extends InlayType {
         // Token failed. Issue a public friendly message, though this should
         // never be seen by anyone legit.
         Civi::log()->notice("Token error: " . $e->getMessage . "\n" . $e->getTraceAsString());
-        watchdog('inlay', $e->getMessage() . "\n" . $e->getTraceAsString, array(), WATCHDOG_ERROR);
         throw new \Civi\Inlay\ApiException(400,
           ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]);
+      }
+
+      // Validation that is more expensive, and for fields where invalid data
+      // would likely represent misuse of the form is done now - after the
+      // token check, to avoid wasting server resources on spammers trying to
+      // randomly post to the endpoint.
+
+      // If we were expecting a uni, check that now.
+      if ($this->config['uniAsk'] && !empty($data['uni'])) {
+        if ($this->getUnis((int) $data['uni'])) {
+          // Uni is valid.
+          $valid['uni'] = (int) $data['uni'];
+        }
+        else {
+          // Uni is not valid. Suggests we did not generate it as an option.
+          Civi::log()->error("Invalid university contact ID submitted: " . json_encode(['inlay' => $this->getName(), 'inputData' => $data]));
+          throw new \Civi\Inlay\ApiException(400,
+            ['error' => "Invalid request, please try reloading the page. Code ICF2"]);
+        }
+      }
+
+      if ($this->config['phoneAsk'] && !empty($data['phone'])) {
+        // Check the phone.
+        $valid['phone'] = preg_replace('/[^0-9+]/', '', $data['phone']);
       }
     }
 
@@ -174,8 +250,36 @@ class Contact extends InlayType {
    * @return string Content of a Javascript file.
    */
   public function getExternalScript() {
-    return file_get_contents(E::path('dist/contact.js'));
+    return file_get_contents(E::path('dist/inlay-contact.js'));
   }
 
+
+  /**
+   * Custom function to get unis.
+   *
+   * @return array contact ID => university name
+   */
+  public function getUnis($checkID=NULL) {
+    $unis = [];
+
+    $api = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('legal_name', 'id')
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('contact_sub_type', 'IN', ['ACIHECollege', 'ACIUniversity'])
+      ->addWhere('is_deleted', '=', FALSE)
+    ;
+    if ($checkID) {
+      $api->addWhere('id', '=', $checkID);
+    }
+    $result = $api
+      ->addOrderBy('legal_name', 'ASC')
+      ->execute();
+
+    foreach ($result as $uni) {
+      $unis[] = ['id' => $uni['id'], 'name' => $uni['legal_name']];
+    }
+
+    return $unis;
+  }
 }
 

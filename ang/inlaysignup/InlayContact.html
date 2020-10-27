@@ -3,12 +3,6 @@
 
   <form name="inlayForm" crm-ui-id-scope>
 
-    <!--
-      <div class="help">
-      <p>{{ts('To view more debugging information, edit the URL and include "?angularDebug=1".')}}</p>
-      </div>
-    -->
-
     <div crm-ui-field="{name: 'inlayForm.name', title: ts('Name'), help: hs('full_name')}">
       <input
         crm-ui-id="inlayForm.name"
@@ -17,6 +11,69 @@
         class="crm-form-text"
         placeholder="{{ts('Our lovely contact form')}}"
         />
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.publicTitle', title: ts('Public Title')}">
+      <input
+        crm-ui-id="inlayForm.publicTitle"
+        name="publicTitle"
+        ng-model="inlay.config.publicTitle"
+        class="crm-form-text"
+        placeholder="{{ts('e.g. Get in touch')}}"
+        />
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.instructionsHTML', title: ts('InstructionsHTML for user about the message field')}">
+      <textarea
+        crm-ui-id="inlayForm.instructionsHTML"
+        crm-ui-richtext
+        name="instructionsHTML"
+        ng-model="inlay.config.instructionsHTML"
+        class="crm-form-text"
+        ></textarea>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.defaultMessage', title: ts('Default message (optional, useful for hinting what they should write.)')}">
+      <textarea
+        crm-ui-id="inlayForm.defaultMessage"
+        name="defaultMessage"
+        ng-model="inlay.config.defaultMessage"
+        ></textarea>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.phoneAsk', title: ts('Collect phone number?')}">
+      <input
+        type="checkbox"
+        crm-ui-id="inlayForm.phoneAsk"
+        name="phoneAsk"
+        ng-model="inlay.config.phoneAsk"
+        />
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.uniAsk', title: ts('Collect a student\'s university?')}">
+      <select
+        crm-ui-select="{allowClear:true, dropdownAutoWidth: true}"
+        crm-ui-id="inlayForm.uniAsk"
+        name="uniAsk"
+        ng-model="inlay.config.uniAsk"
+        style="width: 100%"
+        >
+        <option value="">No</option>
+        <option value="is student at">Yes</option>
+        </select>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.groupAsk', title: ts('Collect a group?')}">
+      <select
+        crm-ui-id="inlayForm.groupAsk"
+        name="groupAsk"
+        ng-model="inlay.config.groupAsk"
+        style="width: 100%"
+        >
+          <option value="">No</option>
+          <option value="is Contact for">is Contact for</option>
+          <option value="is Member of">is Member of</option>
+        </select>
     </div>
 
     <div crm-ui-field="{name: 'inlayForm.smallprintHTML', title: ts('Text by submit button, e.g. explaining GDPR')}">
@@ -48,6 +105,17 @@
         class="crm-form-text"
         ></textarea>
     </div>
+
+    <div crm-ui-field="{name: 'inlayForm.assignee', title: ts('Assign activity to (choose staff member)')}">
+      <input
+        crm-entityref="{entity: 'Contact', select: {allowClear:true}}"
+        crm-ui-id="inlayForm.assignee"
+        name="assignee"
+        ng-model="inlay.config.assignee"
+        />
+    </div>
+
+    <!-- todo email assignee? -->
 
     <div>
       <button ng-click="save()">{{ts('Save')}}</button>

@@ -253,7 +253,7 @@ class InlaySignup extends InlayType {
    * @return string Content of a Javascript file.
    */
   public function getExternalScript() {
-    return file_get_contents(E::path('dist/bundle.js'));
+    return file_get_contents(E::path('dist/inlay-signup.js'));
   }
 
 }

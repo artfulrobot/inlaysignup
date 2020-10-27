@@ -1,3 +1,4 @@
 {
-    "/dist/bundle.js": "/dist/bundle.js"
+    "/dist/inlay-contact.js": "/dist/inlay-contact.js",
+    "/dist/inlay-signup.js": "/dist/inlay-signup.js"
 }
