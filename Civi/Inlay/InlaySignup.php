@@ -181,11 +181,12 @@ class InlaySignup extends InlayType {
       $template = civicrm_api3('MessageTemplate', 'get', [
         'id'         => $this->config['welcomeEmailID'],
         'sequential' => 1,
-        'return'     => 'id, msg_title',
+        'return'     => 'id,msg_title',
       ]);
       if ($template['count'] != 1) {
         throw new \RuntimeException("Failed to find email message template specified in InlaySignup " . ($this->instanceData['name']));
       }
+      $template = $template['values'][0];
       $from = civicrm_api3('OptionValue', 'getvalue', [
         'return'          => "label",
         'option_group_id' => "from_email_address",
