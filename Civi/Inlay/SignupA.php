@@ -60,10 +60,21 @@ class SignupA extends InlayType {
       // Name of global Javascript function used to boot this app.
       'init'             => 'inlaySignupAInit',
     ];
-    foreach ([
-      'submitButtonText', 'publicTitle', 'smallprintHTML', 'webThanksHTML', 'instructionsHTML', 'phoneAsk'
+    foreach (['submitButtonText', 'publicTitle', 'smallprintHTML', 'webThanksHTML', 'instructionsHTML', // 'phoneAsk'
     ] as $_) {
       $data[$_] = $this->config[$_] ?? '';
+    }
+
+    $data['socials'] = [];
+    foreach ($this->config['socials'] as $social) {
+      $_ = ['name' => $social];
+      if ($social === 'twitter') {
+        $_['tweet'] = $this->config['tweet'];
+      }
+      elseif ($social === 'whatsapp') {
+        $_['whatsappText'] = $this->config['whatsappText'];
+      }
+      $data['socials'][] = $_;
     }
 
     // Count people signed up...
@@ -114,6 +125,7 @@ class SignupA extends InlayType {
       throw new \Civi\Inlay\ApiException(500, ['error' => 'Server error: XCM1']);
     }
 
+    return ['success' =>1];
     return ['error' => 'unfinished'];
     // Require 'contactform1' form processor.
     try {

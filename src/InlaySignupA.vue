@@ -79,7 +79,10 @@
 
     </form>
 
-    <div v-if="stage === 'thanks'" v-html="inlay.initData.webThanksHTML"></div>
+    <div v-if="stage === 'thanks'">
+      <div v-html="inlay.initData.webThanksHTML"></div>
+      <inlay-socials :socials="inlay.initData.socials" icons="1"></inlay-socials>
+    </div>
   </div>
 </template>
 <style lang="scss">
@@ -110,16 +113,17 @@
 </style>
 <script>
 import InlayProgress from './InlayProgress.vue';
+import InlaySocials from './InlaySocials.vue';
 import OmeterSosTree from './OmeterSosTree.vue';
 // import 'vue-select/dist/vue-select.css';
 // import vSelect from 'vue-select';
 
 export default {
   props: ['inlay'],
-  components: {InlayProgress, OmeterSosTree},
+  components: {InlayProgress, InlaySocials, OmeterSosTree},
   data() {
     const d = {
-      stage: 'form',
+      stage: 'thanks',
       myId: this.$root.getNextId(),
 
       first_name: '',
