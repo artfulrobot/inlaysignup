@@ -339,7 +339,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     var d = {
-      stage: 'thanks',
+      stage: 'form',
       myId: this.$root.getNextId(),
       first_name: '',
       last_name: '',
@@ -526,10 +526,37 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['count', 'stmt', 'target'],
   data: function data() {
-    return {};
+    return {
+      treeAnim: 0,
+      animStart: false,
+      step: 0
+    };
+  },
+  computed: {
+    trees: function trees() {
+      return '🌲'.repeat(parseInt(this.step * 10));
+    }
+  },
+  mounted: function mounted() {
+    window.requestAnimationFrame(this.animate.bind(this));
+  },
+  methods: {
+    animate: function animate(t) {
+      if (!this.animStart) {
+        this.animStart = t;
+      } // Allow 1 s for the animation.
+
+
+      this.step = Math.min(1, (t - this.animStart) / 1000);
+
+      if (this.step < 1) {
+        window.requestAnimationFrame(this.animate.bind(this));
+      }
+    }
   }
 });
 
@@ -586,6 +613,25 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 // module
 exports.push([module.i, "ul.inlay-socials {\n  list-style: none;\n  margin: 0 -1rem;\n  padding: 0;\n  display: flex;\n  flex-wrap: wrap;\n}\nul.inlay-socials > li {\n  margin: 1rem 0;\n  padding: 1 1rem;\n  flex: 1 0 auto;\n  list-style: none;\n}\nul.inlay-socials > li > a, ul.inlay-socials > li > a:hover, ul.inlay-socials > li > a:visited, ul.inlay-socials > li > a:active {\n  text-decoration: none;\n  border-radius: 4px;\n  display: block;\n  padding: 0.5rem 1rem;\n  height: 100%;\n  color: black;\n  text-align: center;\n}\nul.inlay-socials > li > a {\n  background-color: #e8e8e8;\n}\nul.inlay-socials > li > a:hover, ul.inlay-socials > li > a:active {\n  background-color: #e0e0e0;\n}\nul.inlay-socials > li svg {\n  vertical-align: baseline;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/sass-loader/dist/cjs.js?!./node_modules/vue-loader/lib/index.js?!./src/OmeterSosTree.vue?vue&type=style&index=0&lang=scss&":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/sass-loader/dist/cjs.js??ref--6-3!./node_modules/vue-loader/lib??vue-loader-options!./src/OmeterSosTree.vue?vue&type=style&index=0&lang=scss& ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".treeometer {\n  display: flex;\n  flex-wrap: wrap;\n  max-width: 20rem;\n  align-items: center;\n}\n.treeometer .treeometer__trees {\n  flex: 1 0 20rem;\n}\n.treeometer .treeometer__bignum {\n  flex: 0 0 auto;\n  padding-right: 1rem;\n  font-size: 3rem;\n  font-weight: bold;\n}\n.treeometer .treeometer__words {\n  flex: 1 1 auto;\n  font-size: 1.2rem;\n}\n", ""]);
 
 // exports
 
@@ -1141,6 +1187,36 @@ if(false) {}
 
 
 var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../node_modules/postcss-loader/src??ref--6-2!../node_modules/sass-loader/dist/cjs.js??ref--6-3!../node_modules/vue-loader/lib??vue-loader-options!./InlaySocials.vue?vue&type=style&index=0&lang=scss& */ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/sass-loader/dist/cjs.js?!./node_modules/vue-loader/lib/index.js?!./src/InlaySocials.vue?vue&type=style&index=0&lang=scss&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/sass-loader/dist/cjs.js?!./node_modules/vue-loader/lib/index.js?!./src/OmeterSosTree.vue?vue&type=style&index=0&lang=scss&":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/sass-loader/dist/cjs.js??ref--6-3!./node_modules/vue-loader/lib??vue-loader-options!./src/OmeterSosTree.vue?vue&type=style&index=0&lang=scss& ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../node_modules/postcss-loader/src??ref--6-2!../node_modules/sass-loader/dist/cjs.js??ref--6-3!../node_modules/vue-loader/lib??vue-loader-options!./OmeterSosTree.vue?vue&type=style&index=0&lang=scss& */ "./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/sass-loader/dist/cjs.js?!./node_modules/vue-loader/lib/index.js?!./src/OmeterSosTree.vue?vue&type=style&index=0&lang=scss&");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -2183,13 +2259,17 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "treeometer" }, [
-    _vm._v(
-      "\n  " +
-        _vm._s(_vm.count) +
-        " " +
-        _vm._s(_vm.stmt) +
-        "\n  🌲🌲🌲🌲🌲🌲🌲🌲\n"
-    )
+    _c(
+      "div",
+      { staticClass: "treeometer__trees", staticStyle: { width: "20rem" } },
+      [_vm._v(_vm._s(_vm.trees))]
+    ),
+    _vm._v(" "),
+    _c("span", { staticClass: "treeometer__bignum" }, [
+      _vm._v(_vm._s(_vm.count.toLocaleString()))
+    ]),
+    _vm._v(" "),
+    _c("span", { staticClass: "treeometer__words" }, [_vm._v(_vm._s(_vm.stmt))])
   ])
 }
 var staticRenderFns = []
@@ -14600,7 +14680,9 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _OmeterSosTree_vue_vue_type_template_id_4626c95c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./OmeterSosTree.vue?vue&type=template&id=4626c95c& */ "./src/OmeterSosTree.vue?vue&type=template&id=4626c95c&");
 /* harmony import */ var _OmeterSosTree_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OmeterSosTree.vue?vue&type=script&lang=js& */ "./src/OmeterSosTree.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* empty/unused harmony star reexport *//* harmony import */ var _OmeterSosTree_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./OmeterSosTree.vue?vue&type=style&index=0&lang=scss& */ "./src/OmeterSosTree.vue?vue&type=style&index=0&lang=scss&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
 
 
 
@@ -14608,7 +14690,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* normalize component */
 
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _OmeterSosTree_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
   _OmeterSosTree_vue_vue_type_template_id_4626c95c___WEBPACK_IMPORTED_MODULE_0__["render"],
   _OmeterSosTree_vue_vue_type_template_id_4626c95c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
@@ -14637,6 +14719,22 @@ component.options.__file = "src/OmeterSosTree.vue"
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_OmeterSosTree_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../node_modules/babel-loader/lib??ref--4-0!../node_modules/vue-loader/lib??vue-loader-options!./OmeterSosTree.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./src/OmeterSosTree.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_OmeterSosTree_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./src/OmeterSosTree.vue?vue&type=style&index=0&lang=scss&":
+/*!*****************************************************************!*\
+  !*** ./src/OmeterSosTree.vue?vue&type=style&index=0&lang=scss& ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_sass_loader_dist_cjs_js_ref_6_3_node_modules_vue_loader_lib_index_js_vue_loader_options_OmeterSosTree_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../node_modules/style-loader!../node_modules/css-loader!../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../node_modules/postcss-loader/src??ref--6-2!../node_modules/sass-loader/dist/cjs.js??ref--6-3!../node_modules/vue-loader/lib??vue-loader-options!./OmeterSosTree.vue?vue&type=style&index=0&lang=scss& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/sass-loader/dist/cjs.js?!./node_modules/vue-loader/lib/index.js?!./src/OmeterSosTree.vue?vue&type=style&index=0&lang=scss&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_sass_loader_dist_cjs_js_ref_6_3_node_modules_vue_loader_lib_index_js_vue_loader_options_OmeterSosTree_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_sass_loader_dist_cjs_js_ref_6_3_node_modules_vue_loader_lib_index_js_vue_loader_options_OmeterSosTree_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_sass_loader_dist_cjs_js_ref_6_3_node_modules_vue_loader_lib_index_js_vue_loader_options_OmeterSosTree_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_sass_loader_dist_cjs_js_ref_6_3_node_modules_vue_loader_lib_index_js_vue_loader_options_OmeterSosTree_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_sass_loader_dist_cjs_js_ref_6_3_node_modules_vue_loader_lib_index_js_vue_loader_options_OmeterSosTree_vue_vue_type_style_index_0_lang_scss___WEBPACK_IMPORTED_MODULE_0___default.a); 
 
 /***/ }),
 

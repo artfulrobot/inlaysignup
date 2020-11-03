@@ -123,7 +123,7 @@ export default {
   components: {InlayProgress, InlaySocials, OmeterSosTree},
   data() {
     const d = {
-      stage: 'thanks',
+      stage: 'form',
       myId: this.$root.getNextId(),
 
       first_name: '',
