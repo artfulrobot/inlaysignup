@@ -27,7 +27,7 @@ import InlayContactForm from './InlayContactForm.vue';
         methods: {
           getNextId() {
             this.formID++;
-            return `i${this.inlay.public_id}-${this.formID}`;
+            return `i${this.inlay.publicID}-${this.formID}`;
           }
         }
       });
