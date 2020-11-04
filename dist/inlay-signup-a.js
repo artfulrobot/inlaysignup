@@ -325,6 +325,40 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
  // import 'vue-select/dist/vue-select.css';
@@ -527,25 +561,77 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['count', 'stmt', 'target'],
   data: function data() {
     return {
       treeAnim: 0,
       animStart: false,
-      step: 0
+      step: 0,
+      containerSize: false,
+      debounce: false
     };
   },
   computed: {
     trees: function trees() {
-      return '🌲'.repeat(parseInt(this.step * 10));
+      var max = this.containerSize;
+      var greenTo = parseInt(this.step * max * 0.7);
+      var t = [];
+
+      for (var i = 0; i < max; i++) {
+        t.push(i > greenTo ? 'faded' : '');
+      }
+
+      return t;
     }
   },
   mounted: function mounted() {
-    window.requestAnimationFrame(this.animate.bind(this));
+    var _this = this;
+
+    this.handleWindowResize();
+    window.addEventListener('resize', function (e) {
+      if (_this.debounce) {
+        window.clearTimeout(_this.debounce);
+      }
+
+      _this.debounce = window.setTimeout(_this.handleWindowResize.bind(_this), 300);
+    });
+    var observer = new IntersectionObserver(this.handleIntersectionChange.bind(this), {
+      // root: this.$refs.treesContainer,
+      // rootMargin: '0px',
+      threshold: 1.0
+    });
+    observer.observe(this.$refs.treesContainer);
   },
   methods: {
+    handleIntersectionChange: function handleIntersectionChange(entries, observer) {
+      var _this2 = this;
+
+      console.log("handleIntersectionChange");
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          _this2.animStart = false;
+          window.requestAnimationFrame(_this2.animate.bind(_this2));
+        }
+      });
+    },
+    handleWindowResize: function handleWindowResize(e) {
+      this.debounce = false; // Allow 18px for a tree
+
+      this.containerSize = Math.floor(this.$refs.treesContainer.clientWidth / this.convertRemToPixels(18 / 16));
+    },
+    convertRemToPixels: function convertRemToPixels(rem) {
+      return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    },
     animate: function animate(t) {
+      console.log("animate called");
+
       if (!this.animStart) {
         this.animStart = t;
       } // Allow 1 s for the animation.
@@ -593,7 +679,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, ".inlay-signup-a .isa-2-cols {\n  margin-left: -1rem;\n  margin-right: -1rem;\n  display: flex;\n  flex-wrap: wrap;\n}\n.inlay-signup-a .isa-2-cols > div {\n  flex: 1 0 8rem;\n  padding: 0 1rem;\n}\n.inlay-signup-a label {\n  display: block;\n}\n.inlay-signup-a input[type=\"text\"],\n.inlay-signup-a input[type=\"email\"],\n.inlay-signup-a textarea {\n  width: 100%;\n  margin-bottom: 1rem;\n}\n", ""]);
+exports.push([module.i, ".inlay-signup-a .isa-2-cols {\n  margin-left: -1rem;\n  margin-right: -1rem;\n  display: flex;\n  flex-wrap: wrap;\n}\n.inlay-signup-a .isa-2-cols > div {\n  flex: 1 0 18rem;\n  padding: 0 1rem;\n}\n.inlay-signup-a .isa-input-wrapper {\n  display: flex;\n  flex-wrap: wrap;\n  margin-bottom: 1rem;\n}\n.inlay-signup-a input[type=\"text\"],\n.inlay-signup-a input[type=\"email\"],\n.inlay-signup-a label {\n  border: solid 2px white;\n  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);\n  padding: 0.75rem 1rem;\n  line-height: 1;\n  margin: 0;\n  font-size: 1.1rem;\n}\n.inlay-signup-a label {\n  display: block;\n  flex: 0 0 auto;\n  background: white;\n}\n.inlay-signup-a input[type=\"text\"],\n.inlay-signup-a input[type=\"email\"] {\n  flex: 1 0 10rem;\n  width: 10rem;\n  background: transparent;\n}\n.inlay-signup-a .isa-submit {\n  text-align: center;\n}\n.inlay-signup-a .isa-submit button {\n  font-size: 1.1rem;\n  background: #ffc839;\n}\n.inlay-signup-a .isa-submit button:hover {\n  background: #f67f00;\n}\n", ""]);
 
 // exports
 
@@ -631,7 +717,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, ".treeometer {\n  display: flex;\n  flex-wrap: wrap;\n  max-width: 20rem;\n  align-items: center;\n}\n.treeometer .treeometer__trees {\n  flex: 1 0 20rem;\n}\n.treeometer .treeometer__bignum {\n  flex: 0 0 auto;\n  padding-right: 1rem;\n  font-size: 3rem;\n  font-weight: bold;\n}\n.treeometer .treeometer__words {\n  flex: 1 1 auto;\n  font-size: 1.2rem;\n}\n", ""]);
+exports.push([module.i, ".treeometer {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: center;\n  background: #ffc839;\n  padding: 1rem;\n  color: white;\n  margin-bottom: 1rem;\n  font-weight: bold;\n}\n.treeometer .treeometer__trees {\n  flex: 0 0 100%;\n  display: flex;\n  justify-content: space-between;\n}\n.treeometer .treeometer__trees .faded {\n  opacity: 0.2;\n}\n.treeometer .treeometer__bignum {\n  flex: 0 0 auto;\n  padding-right: 1rem;\n  font-size: 3rem;\n}\n.treeometer .treeometer__words {\n  flex: 0 1 auto;\n  font-size: 2rem;\n}\n", ""]);
 
 // exports
 
@@ -1895,7 +1981,7 @@ var render = function() {
             },
             [
               _c("div", { staticClass: "isa-2-cols" }, [
-                _c("div", [
+                _c("div", { staticClass: "isa-input-wrapper" }, [
                   _c("label", { attrs: { for: _vm.myId + "fname" } }, [
                     _vm._v("First name")
                   ]),
@@ -1929,7 +2015,7 @@ var render = function() {
                   })
                 ]),
                 _vm._v(" "),
-                _c("div", [
+                _c("div", { staticClass: "isa-input-wrapper" }, [
                   _c("label", { attrs: { for: _vm.myId + "lname" } }, [
                     _vm._v("Last name")
                   ]),
@@ -1964,7 +2050,7 @@ var render = function() {
                 ])
               ]),
               _vm._v(" "),
-              _c("div", [
+              _c("div", { staticClass: "isa-input-wrapper" }, [
                 _c("label", { attrs: { for: _vm.myId + "email" } }, [
                   _vm._v("Email")
                 ]),
@@ -2000,7 +2086,7 @@ var render = function() {
               _vm._v(" "),
               _vm.inlay.initData.smallprintHTML
                 ? _c("div", {
-                    staticClass: "ic-smallprint",
+                    staticClass: "isa-smallprint",
                     domProps: {
                       innerHTML: _vm._s(_vm.inlay.initData.smallprintHTML)
                     }
@@ -2009,11 +2095,12 @@ var render = function() {
               _vm._v(" "),
               _c(
                 "div",
-                { staticClass: "ic-submit" },
+                { staticClass: "isa-submit" },
                 [
                   _c(
                     "button",
                     {
+                      staticClass: "submit",
                       attrs: { disabled: _vm.$root.submissionRunning },
                       on: { click: _vm.wantsToSubmit }
                     },
@@ -2259,17 +2346,22 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "treeometer" }, [
-    _c(
-      "div",
-      { staticClass: "treeometer__trees", staticStyle: { width: "20rem" } },
-      [_vm._v(_vm._s(_vm.trees))]
-    ),
-    _vm._v(" "),
     _c("span", { staticClass: "treeometer__bignum" }, [
       _vm._v(_vm._s(_vm.count.toLocaleString()))
     ]),
     _vm._v(" "),
-    _c("span", { staticClass: "treeometer__words" }, [_vm._v(_vm._s(_vm.stmt))])
+    _c("span", { staticClass: "treeometer__words" }, [
+      _vm._v(_vm._s(_vm.stmt))
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { ref: "treesContainer", staticClass: "treeometer__trees" },
+      _vm._l(_vm.trees, function(c, i) {
+        return _c("span", { key: i, class: c }, [_vm._v("🌲")])
+      }),
+      0
+    )
   ])
 }
 var staticRenderFns = []

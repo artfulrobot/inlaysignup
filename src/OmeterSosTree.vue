@@ -1,8 +1,14 @@
 <template>
   <div class="treeometer">
-    <div class="treeometer__trees" style="width: 20rem">{{trees}}</div>
     <span class="treeometer__bignum">{{ count.toLocaleString() }}</span>
     <span class="treeometer__words">{{stmt}}</span>
+
+    <div class="treeometer__trees" ref="treesContainer">
+      <span v-for="(c, i) in trees"
+            :key="i"
+            :class="c"
+            >🌲</span>
+    </div>
   </div>
 </template>
 <script>
@@ -13,18 +19,58 @@ export default {
       treeAnim: 0,
       animStart: false,
       step: 0,
+
+      containerSize:false,
+      debounce: false,
     };
   },
   computed:{
     trees() {
-      return '🌲'.repeat(parseInt(this.step * 10));
-    }
+      var max = this.containerSize;
+      var greenTo = parseInt(this.step * max * 0.7);
+      const t = [];
+      for (var i=0; i<max; i++) {
+        t.push(i > greenTo ? 'faded' : '');
+      }
+      return t;
+    },
   },
   mounted() {
-    window.requestAnimationFrame(this.animate.bind(this));
+    this.handleWindowResize();
+    window.addEventListener('resize', e => {
+      if (this.debounce) {
+        window.clearTimeout(this.debounce);
+      }
+      this.debounce = window.setTimeout(this.handleWindowResize.bind(this), 300);
+    });
+
+    var observer = new IntersectionObserver(this.handleIntersectionChange.bind(this), {
+      // root: this.$refs.treesContainer,
+      // rootMargin: '0px',
+      threshold: 1.0
+    });
+    observer.observe(this.$refs.treesContainer);
   },
   methods:{
+    handleIntersectionChange(entries, observer) {
+      console.log("handleIntersectionChange");
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          this.animStart = false;
+          window.requestAnimationFrame(this.animate.bind(this));
+        }
+      });
+    },
+    handleWindowResize(e) {
+      this.debounce = false;
+      // Allow 18px for a tree
+      this.containerSize = Math.floor(this.$refs.treesContainer.clientWidth / this.convertRemToPixels(18/16));
+    },
+    convertRemToPixels(rem) {
+      return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    },
     animate(t) {
+      console.log("animate called");
       if (!this.animStart) {
         this.animStart = t;
       }
@@ -39,23 +85,38 @@ export default {
 </script>
 <style lang="scss">
 .treeometer {
+  $darkGreen: #366351;
+  $yellow: #ffc839;
+  $orange: #f67f00;
+
   display: flex;
   flex-wrap:wrap;
-  max-width: 20rem;
   align-items: center;
+  justify-content: center;
+  background: $yellow;
+  padding: 1rem;
+  color: white;
+  margin-bottom: 1rem;
+  font-weight: bold;
 
   .treeometer__trees {
-    flex: 1 0 20rem;
+    flex: 0 0 100%;
+    display: flex;
+    justify-content: space-between;
+
+    .faded {
+      opacity: 0.2;
+    }
   }
+
   .treeometer__bignum {
     flex: 0 0 auto;
     padding-right: 1rem;
     font-size:3rem;
-    font-weight: bold;
   }
   .treeometer__words {
-    flex: 1 1 auto;
-    font-size: 1.2rem;
+    flex: 0 1 auto;
+    font-size: 2rem;
   }
 }
 </style>

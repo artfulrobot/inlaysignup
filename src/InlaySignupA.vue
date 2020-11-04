@@ -12,7 +12,7 @@
     <form action='#' @submit.prevent="submitForm" v-if="stage === 'form'">
 
       <div class="isa-2-cols">
-        <div>
+        <div class="isa-input-wrapper">
           <label :for="myId + 'fname'" >First name</label>
           <input
             required
@@ -24,7 +24,7 @@
             v-model="first_name"
             />
         </div>
-        <div>
+        <div class="isa-input-wrapper">
           <label :for="myId + 'lname'" >Last name</label>
           <input
             required
@@ -38,7 +38,7 @@
         </div>
       </div>
 
-      <div>
+      <div class="isa-input-wrapper">
         <label :for="myId + 'email'" >Email</label>
         <input
           required
@@ -65,14 +65,15 @@
       </div>
       -->
 
-      <div class="ic-smallprint"
+      <div class="isa-smallprint"
         v-if="inlay.initData.smallprintHTML"
         v-html="inlay.initData.smallprintHTML"></div>
 
-      <div class="ic-submit">
+      <div class="isa-submit">
         <button
          @click="wantsToSubmit"
          :disabled="$root.submissionRunning"
+          class="submit"
           >{{ $root.submissionRunning ? "Please wait.." : inlay.initData.submitButtonText }}</button>
         <inlay-progress ref="progress"></inlay-progress>
       </div>
@@ -86,6 +87,8 @@
   </div>
 </template>
 <style lang="scss">
+  $orange: #f67f00;
+  $yellow: #ffc839;
 .inlay-signup-a {
   .isa-2-cols {
     margin-left: -1rem;
@@ -94,20 +97,51 @@
     flex-wrap: wrap;
 
     &>div {
-      flex: 1 0 8rem;
+      flex: 1 0 18rem;
       padding: 0 1rem;
     }
   }
 
+  .isa-input-wrapper {
+    display: flex;
+    flex-wrap:wrap;
+    margin-bottom: 1rem;
+  }
+  input[type="text"],
+  input[type="email"],
+  label {
+    border: solid 2px white;
+    box-shadow: 0 4px 0 rgba(0,0,0,.2);
+    padding: 0.75rem 1rem;
+    line-height:1;
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
   label {
     display: block;
+    flex: 0 0 auto;
+    background: white;
   }
 
   input[type="text"],
-  input[type="email"],
-  textarea {
-    width: 100%;
-    margin-bottom: 1rem;
+  input[type="email"]
+  {
+    flex: 1 0 10rem;
+    width: 10rem; // needed
+    background: transparent;
+  }
+
+  .isa-submit {
+    text-align: center;
+
+    button {
+      font-size: 1.1rem;
+      background: $yellow;
+      &:hover {
+        background: $orange;
+      }
+    }
   }
 }
 </style>
