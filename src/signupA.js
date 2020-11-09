@@ -1,20 +1,20 @@
 import Vue from 'vue';
-import InlayContactForm from './InlayContactForm.vue';
+import InlaySignupA from './InlaySignupA.vue';
 
 (() => {
-  if (!window.inlayContactInit) {
+  if (!window.inlaySignupAInit) {
     // This is the first time this *type* of Inlay has been encountered.
     // We need to define anything global here.
 
     // Create the boot function.
-    window.inlayContactInit = inlay => {
-      const inlayContactNode = document.createElement('div');
-      inlay.script.insertAdjacentElement('afterend', inlayContactNode);
+    window.inlaySignupAInit = inlay => {
+      const inlayNode = document.createElement('div');
+      inlay.script.insertAdjacentElement('afterend', inlayNode);
       /* eslint no-unused-vars: 0 */
       // This is the root app.
       console.debug(inlay);
       const app = new Vue({
-        el: inlayContactNode,
+        el: inlayNode,
         data() {
           var d = {
             inlay,
@@ -23,7 +23,7 @@ import InlayContactForm from './InlayContactForm.vue';
           };
           return d;
         },
-        render: h => h(InlayContactForm, {props: {inlay}}),
+        render: h => h(InlaySignupA, {props: {inlay}}),
         methods: {
           getNextId() {
             this.formID++;
