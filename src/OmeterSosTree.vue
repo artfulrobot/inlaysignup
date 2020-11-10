@@ -63,14 +63,13 @@ export default {
     },
     handleWindowResize(e) {
       this.debounce = false;
-      // Allow 18px for a tree
-      this.containerSize = Math.floor(this.$refs.treesContainer.clientWidth / this.convertRemToPixels(18/16));
+      // Allow 1.5rem for a tree
+      this.containerSize = Math.floor(this.$refs.treesContainer.clientWidth / this.convertRemToPixels(1.5));
     },
     convertRemToPixels(rem) {
       return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
     },
     animate(t) {
-      console.log("animate called");
       if (!this.animStart) {
         this.animStart = t;
       }

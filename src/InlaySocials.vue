@@ -33,7 +33,7 @@ export default {
       facebook: {
         label: 'Facebook',
         url(sn) {
-          return `https://facebook.com/sharer/sharer.php?u=${encodeURIComponent}`;
+          return `https://facebook.com/sharer/sharer.php?u=${urlEncoded}`;
         },
       },
       whatsapp: {
@@ -82,7 +82,7 @@ ul.inlay-socials {
   flex-wrap: wrap;
   &>li {
     margin: 1rem 0;
-    padding: 1 1rem;
+    padding: 0 1rem;
     flex: 1 0 auto;
     list-style: none;
 

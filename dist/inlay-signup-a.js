@@ -386,6 +386,9 @@ __webpack_require__.r(__webpack_exports__);
     target: function target() {
       // always at 70%
       return Math.floor(this.inlay.initData.count / 0.7 / 1000) * 1000 + 1000;
+    },
+    countSigners: function countSigners() {
+      return this.inlay.initData.count + (this.stage === 'thanks' ? 1 : 0);
     }
   },
   methods: {
@@ -498,7 +501,7 @@ __webpack_require__.r(__webpack_exports__);
       facebook: {
         label: 'Facebook',
         url: function url(sn) {
-          return "https://facebook.com/sharer/sharer.php?u=".concat(encodeURIComponent);
+          return "https://facebook.com/sharer/sharer.php?u=".concat(urlEncoded);
         }
       },
       whatsapp: {
@@ -622,16 +625,14 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     handleWindowResize: function handleWindowResize(e) {
-      this.debounce = false; // Allow 18px for a tree
+      this.debounce = false; // Allow 1.5rem for a tree
 
-      this.containerSize = Math.floor(this.$refs.treesContainer.clientWidth / this.convertRemToPixels(18 / 16));
+      this.containerSize = Math.floor(this.$refs.treesContainer.clientWidth / this.convertRemToPixels(1.5));
     },
     convertRemToPixels: function convertRemToPixels(rem) {
       return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
     },
     animate: function animate(t) {
-      console.log("animate called");
-
       if (!this.animStart) {
         this.animStart = t;
       } // Allow 1 s for the animation.
@@ -698,7 +699,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "ul.inlay-socials {\n  list-style: none;\n  margin: 0 -1rem;\n  padding: 0;\n  display: flex;\n  flex-wrap: wrap;\n}\nul.inlay-socials > li {\n  margin: 1rem 0;\n  padding: 1 1rem;\n  flex: 1 0 auto;\n  list-style: none;\n}\nul.inlay-socials > li > a, ul.inlay-socials > li > a:hover, ul.inlay-socials > li > a:visited, ul.inlay-socials > li > a:active {\n  text-decoration: none;\n  border-radius: 4px;\n  display: block;\n  padding: 0.5rem 1rem;\n  height: 100%;\n  color: black;\n  text-align: center;\n}\nul.inlay-socials > li > a {\n  background-color: #e8e8e8;\n}\nul.inlay-socials > li > a:hover, ul.inlay-socials > li > a:active {\n  background-color: #e0e0e0;\n}\nul.inlay-socials > li svg {\n  vertical-align: baseline;\n}\n", ""]);
+exports.push([module.i, "ul.inlay-socials {\n  list-style: none;\n  margin: 0 -1rem;\n  padding: 0;\n  display: flex;\n  flex-wrap: wrap;\n}\nul.inlay-socials > li {\n  margin: 1rem 0;\n  padding: 0 1rem;\n  flex: 1 0 auto;\n  list-style: none;\n}\nul.inlay-socials > li > a, ul.inlay-socials > li > a:hover, ul.inlay-socials > li > a:visited, ul.inlay-socials > li > a:active {\n  text-decoration: none;\n  border-radius: 4px;\n  display: block;\n  padding: 0.5rem 1rem;\n  height: 100%;\n  color: black;\n  text-align: center;\n}\nul.inlay-socials > li > a {\n  background-color: #e8e8e8;\n}\nul.inlay-socials > li > a:hover, ul.inlay-socials > li > a:active {\n  background-color: #e0e0e0;\n}\nul.inlay-socials > li svg {\n  vertical-align: baseline;\n}\n", ""]);
 
 // exports
 
@@ -1961,7 +1962,7 @@ var render = function() {
       _vm._v(" "),
       _c("ometer-sos-tree", {
         attrs: {
-          count: _vm.inlay.initData.count,
+          count: _vm.countSigners,
           target: _vm.target,
           stmt: "trees planted"
         }
@@ -14912,7 +14913,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /var/www/artfulrobot.uk/sites/default/files/civicrm/ext/inlaysignup/src/signupA.js */"./src/signupA.js");
+module.exports = __webpack_require__(/*! /var/www/crm.orangutans-sos.org/sites/all/modules/sos/ext/inlaysignup/src/signupA.js */"./src/signupA.js");
 
 
 /***/ })

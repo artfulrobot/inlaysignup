@@ -4,7 +4,7 @@
     <h2 v-if="inlay.initData.publicTitle">{{inlay.initData.publicTitle}}</h2>
 
     <ometer-sos-tree
-      :count="inlay.initData.count"
+      :count="countSigners"
       :target="target"
       stmt="trees planted"
       ></ometer-sos-tree>
@@ -171,6 +171,9 @@ export default {
     target() {
       // always at 70%
       return Math.floor((this.inlay.initData.count / 0.7) / 1000) * 1000 + 1000;
+    },
+    countSigners() {
+      return this.inlay.initData.count + (this.stage === 'thanks' ? 1 : 0);
     }
   },
   methods: {

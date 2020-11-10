@@ -358,7 +358,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /var/www/artfulrobot.uk/sites/default/files/civicrm/ext/inlaysignup/src/signup.js */"./src/signup.js");
+module.exports = __webpack_require__(/*! /var/www/crm.orangutans-sos.org/sites/all/modules/sos/ext/inlaysignup/src/signup.js */"./src/signup.js");
 
 
 /***/ })

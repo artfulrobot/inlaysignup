@@ -6,6 +6,7 @@ use Civi\Inlay\Type as InlayType;
 use Civi\Inlay\ApiRequest;
 use Civi;
 use CRM_Inlaysignup_ExtensionUtil as E;
+use CRM_Sos_JourneyLogic;
 
 class SignupA extends InlayType {
 
@@ -88,8 +89,10 @@ class SignupA extends InlayType {
         INNER JOIN civicrm_contact c ON gc.contact_id = c.id AND c.is_deleted = 0
         WHERE gc.group_id = $groupID AND gc.status = 'Added'
         ");
+      Civi::log()->info("Count is $data[count] for group $groupID");
     }
     else {
+      Civi::log()->notice("No mailing group configured for whole earth");
       $data['count'] = 0;
     }
 
@@ -117,6 +120,7 @@ class SignupA extends InlayType {
       return ['token' => $this->getCSRFToken(['data' => $data, 'validFrom' => 5, 'validTo' => 120])];
     }
 
+    /*
     // Find Contact with XCM.
     $params = $data + ['contact_type' => 'Individual'];
     $contactID = civicrm_api3('Contact', 'getorcreate', $params)['id'] ?? NULL;
@@ -124,6 +128,15 @@ class SignupA extends InlayType {
       Civi::log()->error('Failed to getorcreate contact with params: ' . json_encode($params));
       throw new \Civi\Inlay\ApiException(500, ['error' => 'Server error: XCM1']);
     }
+     */
+
+    // Process their journey. THIS IS COMPLETELY CUSTOM
+    $journeyParams = $data + [
+      'journey_action' => 'whole_earth_signup',
+      'group_id'       => (int) $this->config['mailingGroup'],
+    ];
+    CRM_Sos_JourneyLogic::processApiRequest($journeyParams);
+
 
     return ['success' =>1];
     return ['error' => 'unfinished'];
@@ -178,7 +191,6 @@ class SignupA extends InlayType {
    * - first_name
    * - last_name
    * - email
-   * - message
    * - token TRUE|unset
    *
    * @param array $data
