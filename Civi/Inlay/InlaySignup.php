@@ -104,10 +104,10 @@ class InlaySignup extends InlayType {
         ->execute()
         ->first()['id'] ?? NULL;
     if (!$emailConsentGroup) {
-      list($total, $added, $notAdded) = \CRM_Contact_BAO_GroupContact::addContactsToGroup([$contactID], $emailConsentGroup, 'Web', 'Added');
+      Civi::log()->error("Failed to find consent_all_email Group; was going to add contact $contactID into it as they signed up.");
     }
     else {
-      Civi::log()->error("Failed to find consent_all_email Group; was going to add contact $contactID into it as they signed up.");
+      list($total, $added, $notAdded) = \CRM_Contact_BAO_GroupContact::addContactsToGroup([$contactID], $emailConsentGroup, 'Web', 'Added');
     }
     \CRM_Gdpr_SLA_Utils::recordSLAAcceptance($contactID);
     \CRM_Gdpr_CommunicationsPreferences_Utils::createCommsPrefActivity($contactID, ['activity_source' => "Subscribed via InlaySignup '" . htmlspecialchars($this->instanceData['name']) . "'"]);
