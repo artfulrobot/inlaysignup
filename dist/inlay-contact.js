@@ -14376,7 +14376,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /var/www/crm.orangutans-sos.org/sites/all/modules/sos/ext/inlaysignup/src/contact.js */"./src/contact.js");
+module.exports = __webpack_require__(/*! /var/www/records.climateoutreach.org.uk/sites/all/modules/coin/civicrm/extensions/inlaysignup/src/contact.js */"./src/contact.js");
 
 
 /***/ })

@@ -1,0 +1,132 @@
+$bg: #F8F8F5;
+$orange: #f25d2a;
+
+body.inlay-download-modal-active {
+  position: fixed;
+  overflow: hidden;
+}
+
+.inlay-download {
+  .idl-overlay {
+    z-index: 1000;
+    position: fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    background-color: rgba(255, 255, 255, 0.8);
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+  &.focussed {
+    .idl-overlay { display: flex; }
+  }
+  // &.at-rest { .idl-overlay { display: none; } }
+  .idl-locator {
+    flex: 0 1 60rem;
+    position: relative;
+    background: $bg;
+    border-radius: 0;
+    max-height: 90vh;
+    overflow: auto;
+    padding: 2rem;
+  }
+
+  .idl-close {
+    display:block;
+    appearance: none;
+    position:absolute;
+    margin: 0;
+    padding: 0;
+    top: 1rem;
+    right: 1rem;
+    width: 4rem;
+    font-size: 2rem;
+    line-height: 1;
+    text-align: center;
+    background: white;
+    color: #888;
+    border: none;
+  }
+  .idl-thanks {
+    font-size: 1.6rem;
+    text-align: center;
+  }
+  // Progress
+  .idl-progress-container {
+    height: 2px;
+    margin-top:0.25rem;
+    .idl-progress {
+      height: 2px;
+    }
+    &.active {
+      background-color: white;
+      .idl-progress {
+        background-color: $orange;
+      }
+    }
+  }
+
+  // Form element styling.
+  label {
+    font-weight: 700;
+    padding: .375rem;
+
+    p {
+      font-size: inherit;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  textarea,
+  input[type="text"],
+  input[type="email"] {
+    padding: .75rem;
+    background-color: #fff;
+    appearance: none;
+    color: #111;
+    border: 1px solid #dcdcdc;
+    width: 100%;
+  }
+
+  // Form layout
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: top;
+    margin:0 -1rem;
+    padding:0;
+  }
+  h2 {
+    flex: 0 100%;
+    padding: 0 5rem 0 1rem;
+  }
+  .idl-field {
+    margin-bottom: 1rem;
+    flex: 1 0 45%;
+    min-width: 18rem;
+    padding: 0 1rem;
+
+    &.question, &.followup {
+      flex: 0 0 100%;
+    }
+  }
+
+  .idl-buttons {
+    flex: 0 0 100%;
+    text-align: center;
+    padding-bottom: 2rem;
+  }
+
+  // Give links a colour.
+  a:link, a:visited {
+    color: $orange;
+  }
+  a:hover, a:active {
+    color: $orange;
+    text-decoration: underline;
+  }
+}
