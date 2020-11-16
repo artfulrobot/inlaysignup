@@ -35,7 +35,7 @@ import './coDownload.scss';
             email: nodes.emailInput.value,
             first_name: nodes.firstNameInput.value,
             last_name: nodes.lastNameInput.value,
-            organisation: nodes.organisation.value,
+            organisation: nodes.orgInput.value,
             location: window.location.href,
             reportTitle: report.title,
             questionResponse: nodes.questionResponse.value,
@@ -218,7 +218,6 @@ import './coDownload.scss';
         downloadLink: downloadAppDiv.querySelector('.idl-thanks a'),
         progress: downloadAppDiv.querySelector('.idl-progress'),
         form: downloadAppDiv.querySelector('form'),
-        organisation: downloadAppDiv.querySelector('.organisation'),
         questionLabel: downloadAppDiv.querySelector('.question label span'),
         questionResponse: downloadAppDiv.querySelector('.question textarea'),
         followupLabel: downloadAppDiv.querySelector('.followup label span'),
@@ -235,7 +234,7 @@ import './coDownload.scss';
       nodes.questionLabel.textContent = inlay.initData.questionText;
       nodes.followupLabel.textContent = inlay.initData.followupText;
 
-      const allInputs = ['emailInput', 'firstNameInput', 'lastNameInput', 'email2Input', 'organisation'].map(i => nodes[i]);
+      const allInputs = ['emailInput', 'firstNameInput', 'lastNameInput', 'email2Input', 'orgInput'].map(i => nodes[i]);
       // Provide ways to close the overlay.
       nodes.overlay.addEventListener('click', function(e) {
         if (this === e.target) reset();
