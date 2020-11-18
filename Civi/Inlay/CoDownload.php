@@ -96,12 +96,13 @@ class CoDownload extends InlayType {
 
     //\CRM_Gdpr_SLA_Utils::recordSLAAcceptance($contactID);
     // @todo record download activity
-    $downloadActivityID = 56;
+    $downloadActivityTypeID = 56;
 
     $htmlSafe = [];
     foreach ($data as $k => $v) {
       $htmlSafe[$k] = $v;
     }
+    $htmlSafe['organisation'] = $htmlSafe['organisation'] ?? '';
     $config = [];
     $config['questionText'] = htmlspecialchars($this->config['questionText']);
     $config['followupText'] = htmlspecialchars($this->config['followupText']);
@@ -113,27 +114,28 @@ class CoDownload extends InlayType {
       <p>They chose: <em>$htmlSafe[followup]</em></p>
 HTML;
 
-    $result = civicrm_api3('Activity', 'create', [
+    $downloadActivityID = civicrm_api3('Activity', 'create', [
       'source_contact_id' => $contactID,
       'target_id'         => $contactID,
-      'activity_type_id'  => $downloadActivityID,
+      'activity_type_id'  => $downloadActivityTypeID,
       'subject'           => $data['reportTitle'],
       'status_id'         => 'Completed',
       'details'           => $details,
-    ]);
+    ])['id'];
 
     if ($data['followup'] === 'Yes') {
       $date = strtotime('today + 1 month');
       // 10am seems reasonable. At least if they're in our timezone...
       $date = date('Y-m-d 10:00:00', $date);
       $result = civicrm_api3('Activity', 'create', [
-        'source_contact_id' => $contactID,
+        'parent_id'          => $downloadActivityID,
+        'source_contact_id'  => $contactID,
         'activity_date_time' => $date,
-        'target_id'         => $contactID,
-        'activity_type_id'  => $downloadActivityID,
-        'subject'           => "Follow up: " . $data['reportTitle'],
-        'status_id'         => 'Scheduled',
-        'details'           => '<p>If this activity is scheduled, then on its date an automatic email will be sent to this contact to follow up on the report. If this activity is Completed, that email has been sent.</p><p>If scheduled, you can cancel this follow up by deleting this activity.</p>',
+        'target_id'          => $contactID,
+        'activity_type_id'   => $downloadActivityTypeID,
+        'subject'            => "Follow up: " . $data['reportTitle'],
+        'status_id'          => 'Scheduled',
+        'details'            => '<p>If this activity is scheduled, then on its date an automatic email will be sent to this contact to follow up on the report. If this activity is Completed, that email has been sent.</p><p>If scheduled, you can cancel this follow up by deleting this activity.</p>',
       ]);
     }
 
