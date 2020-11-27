@@ -106,16 +106,27 @@
         ></textarea>
     </div>
 
-    <div crm-ui-field="{name: 'inlayForm.assignee', title: ts('Assign activity to (choose staff member)')}">
-      <input
-        crm-entityref="{entity: 'Contact', select: {allowClear:true}}"
-        crm-ui-id="inlayForm.assignee"
-        name="assignee"
-        ng-model="inlay.config.assignee"
-        />
-    </div>
+    <div crm-ui-accordion="{title: ts('Who to notify')}">
+      <div crm-ui-field="{name: 'inlayForm.assignee', title: ts('Assign activity to (choose staff member)')}">
+        <input
+          crm-entityref="{entity: 'Contact', select: {allowClear:true}}"
+          crm-ui-id="inlayForm.assignee"
+          name="assignee"
+          ng-model="inlay.config.assignee"
+          />
+      </div>
 
-    <!-- todo email assignee? -->
+      <div crm-ui-field="{name: 'inlayForm.notifyEmail', title: ts('Email address (if not the primary email of the assignee)')}">
+        <input
+          type="email"
+          crm-ui-id="inlayForm.notifyEmail"
+          name="notifyEmail"
+          ng-model="inlay.config.notifyEmail"
+          class="crm-form-text"
+          placeholder="{{ts('e.g. projectX@peopleandplanet.org')}}"
+          />
+      </div>
+    </div>
 
     <div>
       <button ng-click="save()">{{ts('Save')}}</button>
