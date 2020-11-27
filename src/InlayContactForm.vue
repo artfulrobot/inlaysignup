@@ -12,7 +12,7 @@
             required
             type="text"
             :id="myId + 'fname'"
-            :name="first_name"
+            name="first_name"
             :ref="first_name"
             :disabled="$root.submissionRunning"
             v-model="first_name"
@@ -24,7 +24,7 @@
             required
             type="text"
             :id="myId + 'lname'"
-            :name="last_name"
+            name="last_name"
             :ref="last_name"
             :disabled="$root.submissionRunning"
             v-model="last_name"
@@ -38,7 +38,7 @@
           required
           type="email"
           :id="myId + 'email'"
-          :name="email"
+          name="email"
           :ref="email"
           :disabled="$root.submissionRunning"
           v-model="email"
@@ -50,7 +50,7 @@
         <input
           type="text"
           :id="myId + 'phone'"
-          :name="phone"
+          name="phone"
           :ref="phone"
           :disabled="$root.submissionRunning"
           v-model="phone"
@@ -61,7 +61,7 @@
         <label :for="myId + 'uni'" >University / College</label>
         <v-select
           :id="myId + 'uni'"
-          :name="uni"
+          name="uni"
           :ref="uni"
           :disabled="$root.submissionRunning"
           :options="inlay.initData.unis"
@@ -82,7 +82,7 @@
           cols=60
           rows=10
           :id="myId + 'message'"
-          :name="message"
+          name="message"
           :ref="message"
           :disabled="$root.submissionRunning"
           v-model="message"
