@@ -1,5 +1,5 @@
 <template>
-  <ul class="inlay-socials">
+  <ul class="inlay-socials" :class="buttonStyle">
     <li v-for="sn in buttons">
       <a :class="'inlay-socials--' + sn.name"
         :href="sn.url"
@@ -17,7 +17,7 @@
 </template>
 <script>
 export default {
-  props: ['socials', 'icons'],
+  props: ['socials', 'icons', 'buttonStyle'],
   data() {
 
     const url = window.location.href;
@@ -75,11 +75,17 @@ export default {
 </script>
 <style lang="scss">
 ul.inlay-socials {
+  $twitter: #55acee;
+  $facebook: #3b5999;
+  $whatsapp: #25D366;
+  $linkedin: #0077B5;
+
   list-style: none;
   margin: 0 -1rem;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
+
   &>li {
     margin: 1rem 0;
     padding: 0 1rem;
@@ -95,16 +101,25 @@ ul.inlay-socials {
       color: black;
       text-align: center;
     }
-    &>a {
-      background-color: #e8e8e8;
-    }
-    &>a:hover, &>a:active {
-      background-color: #e0e0e0;
-    }
 
     svg {
       vertical-align: baseline;
     }
+  }
+
+  &.col-buttons>li>a {
+    background-color: #e8e8e8;
+    &.inlay-socials--twitter  { background-color: $twitter;  color: white;}
+    &.inlay-socials--facebook { background-color: $facebook; color: white;}
+    &.inlay-socials--whatsapp { background-color: $whatsapp; color: white;}
+    &.inlay-socials--linkedin { background-color: $linkedin; color: white;}
+  }
+  &.col-icon>li>a {
+    background-color: #e8e8e8;
+    &.inlay-socials--twitter  svg { color: $twitter;  }
+    &.inlay-socials--facebook svg { color: $facebook; }
+    &.inlay-socials--whatsapp svg { color: $whatsapp; }
+    &.inlay-socials--linkedin svg { color: $linkedin; }
   }
 
 }
