@@ -53,7 +53,6 @@ export default {
   },
   methods:{
     handleIntersectionChange(entries, observer) {
-      console.log("handleIntersectionChange");
       entries.forEach(e => {
         if (e.isIntersecting) {
           this.animStart = false;
