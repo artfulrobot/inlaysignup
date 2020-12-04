@@ -22,7 +22,7 @@ class Contact extends InlayType {
     'groupAsk'         => '', // ZLS or a label_a for a relationship type
     'phoneAsk'         => TRUE,
     'assignee'         => NULL,
-    // 'notifyEmail'      => NULL,
+    'notifyEmail'      => NULL,
   ];
 
   /**
@@ -139,13 +139,59 @@ class Contact extends InlayType {
       }
     }
     $fpData['activity_details'] .= '</ul>';
-    $fpData['activity_details'] .= '<pre>'  . htmlspecialchars(json_encode($data, JSON_PRETTY_PRINT)) . '</pre>';
+    // $fpData['activity_details'] .= '<pre>'  . htmlspecialchars(json_encode($data, JSON_PRETTY_PRINT)) . '</pre>';
 
     // Use the Form Processor to process it.
     $result = civicrm_api3('FormProcessor', 'contactform1', $fpData);
 
-    // @todo email activity
+    // Create the notification email.
+    // file_put_contents('/var/www/one.peopleandplanet.org/private-files/art.tmp', json_encode($result, JSON_PRETTY_PRINT));
+    // Parse the output to find the contact ID and activity ID
+    $activityID = NULL;
+    $contactID = NULL;
+    foreach ($result['action'] as $_) {
+      if ($_['action'] === 'make activity') {
+        $activityID = $_['output']['id'];
+      }
+      if ($_['action'] === 'get contact') {
+        $activityID = $_['output']['contact_id'];
+      }
+    }
+    $toEmail = $this->config['notifyEmail'];
+    if (empty($toEmail)) {
+      // Look up primary email of the assignee instead.
+      $toEmail = civicrm_api3('Email', 'getvalue', [
+        'return' => "email",
+        'contact_id' => $this->config['assignee'],
+        'is_primary' => 1,
+      ]);
+    }
 
+    if ($toEmail) {
+      $params = [
+        'template_params' => [
+          // Custom param used in the msgtpl as {contactFormActivityLink}
+          'contactFormActivityLink' => \CRM_Utils_System::url('civicrm/activity/add', [
+            'reset'         => 1,
+            'searchContext' => 'activity',
+            'context'       => 'activity',
+            'cid'           => $this->config['assignee'],
+            'atype'         => \CRM_Core_Pseudoconstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email'),
+            'id'            => $activityID,
+            'action'        => 'update',
+          ], TRUE),
+          // Custom param used in the msgtpl as {contactFormDetail}
+          'contactFormDetail' => '<div style="background:#fafafa;padding: 1rem;margin:1rem 0;border:solid 1px #eaeaea;">' . $fpData['activity_details'] . '</div>',
+        ],
+        // Generic params
+        'id'             => 72, // xxx
+        'from'           => $from = civicrm_api3('OptionValue', 'getvalue', [ 'return' => "label", 'option_group_id' => "from_email_address", 'is_default' => 1]),
+        'to_email'       => $toEmail,
+        'contact_id'     => $this->config['assignee'],
+        'disable_smarty' => 1, // IF it's a Mosaico template
+      ];
+      civicrm_api3('MessageTemplate', 'send', $params);
+    }
     return [ 'success' => 1 ];
   }
 
