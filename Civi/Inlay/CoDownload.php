@@ -9,16 +9,19 @@ use CRM_Inlaysignup_ExtensionUtil as E;
 
 class CoDownload extends InlayType {
 
+  const ACTIVITY_TYPE_ID_DOWNLOAD=56;
+  const ACTIVITY_TYPE_ID_FOLLOWUP=90;
+
   public static $typeName = 'Datawalled Download';
 
   public static $defaultConfig = [
-    'buttonText' => 'Download',
-    //'mailingGroup'     => NULL,
-    //'welcomeEmailID'   => NULL,
-    'webThanksHTML'    => NULL,
-    'questionText' => NULL,
-    'followupText' => NULL,
-    'smallprintHTML'   => NULL,
+    'buttonText'            => 'Download',
+    'webThanksHTML'         => NULL,
+    'questionText'          => NULL,
+    'followupText'          => NULL,
+    'smallprintHTML'        => NULL,
+    'followupMaps'          => [['reportTitle' => 'default', 'messageTplID' => NULL]],
+    'followupMessageFromID' => NULL, /* actually it's "value" */
   ];
 
   /**
@@ -95,8 +98,6 @@ class CoDownload extends InlayType {
     }
 
     //\CRM_Gdpr_SLA_Utils::recordSLAAcceptance($contactID);
-    // @todo record download activity
-    $downloadActivityTypeID = 56;
 
     $htmlSafe = [];
     foreach ($data as $k => $v) {
@@ -117,22 +118,21 @@ HTML;
     $downloadActivityID = civicrm_api3('Activity', 'create', [
       'source_contact_id' => $contactID,
       'target_id'         => $contactID,
-      'activity_type_id'  => $downloadActivityTypeID,
+      'activity_type_id'  => self::ACTIVITY_TYPE_ID_DOWNLOAD,
       'subject'           => $data['reportTitle'],
       'status_id'         => 'Completed',
       'details'           => $details,
     ])['id'];
 
-    if ($data['followup'] === 'Yes') {
-      $date = strtotime('today + 1 month');
-      // 10am seems reasonable. At least if they're in our timezone...
-      $date = date('Y-m-d 10:00:00', $date);
+    if ($this->config['followupText'] && $this->config['followupMessageTemplateID'] && $data['followup'] === 'Yes') {
+
+      $date = $this->getSuitableFollowupDate();
       $result = civicrm_api3('Activity', 'create', [
-        'parent_id'          => $downloadActivityID,
+        'parent_id'          => $downloadActivityID, /* This is a followup */
         'source_contact_id'  => $contactID,
         'activity_date_time' => $date,
         'target_id'          => $contactID,
-        'activity_type_id'   => $downloadActivityTypeID,
+        'activity_type_id'   => self::ACTIVITY_TYPE_ID_FOLLOWUP,
         'subject'            => "Follow up: " . $data['reportTitle'],
         'status_id'          => 'Scheduled',
         'details'            => '<p>If this activity is scheduled, then on its date an automatic email will be sent to this contact to follow up on the report. If this activity is Completed, that email has been sent.</p><p>If scheduled, you can cancel this follow up by deleting this activity.</p>',
@@ -222,4 +222,112 @@ HTML;
     return file_get_contents(E::path('dist/inlay-coDownload.js'));
   }
 
+  public function sendFollowup(Array $activity, $targetContactID) {
+
+    preg_match('/^Follow up: (.*)$/', $activity['subject'], $matches);
+    $messageTemplateID = $this->config['followupMaps'][0]['messageTplID'] ?? NULL;
+    if (!$messageTemplateID) {
+      throw new \InvalidArgumentException("No default message template configured for followup report inlay");
+    }
+    // find the specific message tpl id, if there is one.
+    if (!empty($matches[1])) {
+      // Find the report title in the map.
+      foreach ($this->config['followupMaps'] as $item) {
+        if ($item['reportTitle'] === $matches[1]) {
+          // Found!
+          $messageTemplateID = $item['messageTplID'];
+          break;
+        }
+      }
+    }
+
+    // send the email.
+    // Get the From address.
+    if ($this->config['followupMessageFromID']) {
+      // Try to load the specified entry.
+      $combined = \Civi\Api4\OptionValue::get(FALSE)
+        ->setCheckPermissions(FALSE)
+        ->addSelect('label')
+        ->addWhere('option_group_id:name', '=', 'from_email_address')
+        ->addWhere('is_active', '=', TRUE)
+        ->addWhere('value', '=', (int) $this->config['followupMessageFromID'])
+        ->execute()->first()['label'] ?? NULL;
+    }
+    if (empty($combined)) {
+      // Nothing configured, or loading the configured address failed.
+      // Load default.
+      list($fromName, $fromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    }
+    else {
+      // Split $combined up.
+      $fromEmail = \CRM_Utils_Mail::pluckEmailFromHeader($combined);
+      $_ = explode('"', $combined);
+      $fromName = $_[1] ?? NULL;
+    }
+
+    // Load the target contact.
+    $emailApiParams = [
+      'create_activity' => 0,
+      'template_id'     => $messageTemplateID,
+      'activity_id'     => $activity['id'],
+      'contact_id'      => $targetContactID,
+      'disable_smarty'  => 1,
+      'subject'         => $activity['subject'],
+    ];
+    Civi::log()->info("Sending email with: " . json_encode($emailApiParams, JSON_PRETTY_PRINT));
+    $result = civicrm_api3('Email', 'send', $emailApiParams);
+
+    // Update the activity to Completed.
+    $activityUpdateParams = [
+      'activity_id'        => $activity['id'],
+      'activity_status_id' => 'Completed',
+    ];
+    civicrm_api3('Activity', 'create', $activityUpdateParams);
+
+  }
+  /**
+   * Get a date 2 months hence, but move it forward if it's a weekend or holiday. Also skip the Christmas period.
+   *
+   * @return ?string parsable date string or NULL for now
+   * @return string date in Y-m-d format
+   */
+  public function getSuitableFollowupDate($from=NULL) {
+    if ($from === NULL) {
+      $from = 'today';
+    }
+    $cache = \CRM_Utils_Cache::create(['type' => ['SqlGroup'], 'name' => 'codownload']);
+    $bankHolls = $cache->get('bankHolls', NULL); // Will return default if cached value expired.
+    if (!$bankHolls) {
+      $data = json_decode(file_get_contents('https://www.gov.uk/bank-holidays.json'), TRUE);
+      if ($data) {
+        // Success,
+        $bankHolls = [];
+        foreach ($data as $division => $_) {
+          foreach ($_['events'] as $holiday) {
+            $bankHolls[$holiday['date']] = 1;
+          }
+        }
+        // cache for a month.
+        $cache->set('bankHolls', $bankHolls, new \DateInterval('P1M')); // Keep value for 1 month.
+      }
+    }
+
+    $d = new \DateTime($from);
+    $d->modify('+ 2 months');
+    // Avoid Xmas.
+    $_ = $d->format('m-d');
+    $y = $d->format('Y');
+    if ($_ > '12-18') {
+      $d->setDate($y + 1, 1, 12);
+    }
+    elseif ($_ < '01-12') {
+      $d->setDate($y, 1, 12);
+    }
+
+    // Avoid weekends, holidays.
+    while (array_key_exists($d->format('Y-m-d'), $bankHolls) || $d->format('N') > 5) {
+      $d->modify('+1 day');
+    }
+    return $d->format('Y-m-d 10:00:00');
+  }
 }

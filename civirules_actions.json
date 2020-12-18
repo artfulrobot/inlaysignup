@@ -1,0 +1,8 @@
+[
+  {
+    "name": "inlay_download_send_followup",
+    "label": "Send download followup emails",
+    "class_name": "CRM_CivirulesActions_CoDownloadFollowup"
+  }
+]
+

@@ -28,15 +28,6 @@
         ></textarea>
     </div>
 
-    <div crm-ui-field="{name: 'inlayForm.followupText', title: ts('“May we follow up...” wording')}">
-      <textarea
-        crm-ui-id="inlayForm.followupText"
-        name="followupText"
-        ng-model="inlay.config.followupText"
-        class="crm-form-text"
-        ></textarea>
-    </div>
-
     <div crm-ui-field="{name: 'inlayForm.smallprintHTML', title: ts('Text by submit button, e.g. explaining GDPR')}">
       <textarea
         crm-ui-id="inlayForm.smallprintHTML"
@@ -66,6 +57,69 @@
         class="crm-form-text"
         ></textarea>
     </div>
+
+    <div crm-ui-accordion="{title: ts('Follow-up')}">
+      <div crm-ui-field="{name: 'inlayForm.followupText', title: ts('“May we follow up...” wording')}">
+        <textarea
+          crm-ui-id="inlayForm.followupText"
+          name="followupText"
+          ng-model="inlay.config.followupText"
+          class="crm-form-text"
+          ></textarea>
+      </div>
+
+      <div crm-ui-field="{name: 'inlayForm.followupMessageFromID', title: ts('From address')}">
+        <select
+          crm-ui-select="{allowClear:true, dropdownAutoWidth: true }"
+          style="width: 100%"
+          ng-model="inlay.config.followupMessageFromID"
+          ng-options="i.label for i in fromAddresses track by i.value"
+          >
+          <option value="">(default)</option>
+        </select>
+      </div>
+
+      <p>You can map report titles to specific followup emails</p>
+      <table class="crm-table"><thead><tr><th>Report Title</th><th>Follow up email</th><th>Delete</th></tr></thead>
+        <tbody>
+          <tr ng-repeat="(i, row) in inlay.config.followupMaps">
+            <td>
+              <input
+                ng-if="i > 0"
+                type="text"
+                style="width: 100%;"
+                required
+                ng-model="inlay.config.followupMaps[i].reportTitle"
+                />
+              <div ng-if="i === 0">Default</div>
+            </td>
+            <td>
+              <select
+                style="width: 100%"
+                crm-id="'followup' + i"
+                crm-ui-select="{dropdownAutoWidth: true}"
+                ng-model="inlay.config.followupMaps[i].messageTplID"
+                ng-options="i.msg_title + ' | ' + i.msg_subject for i in messageTpls track by i.id"
+                >
+              </select>
+              <div ng-show="i === 0 && (!row.messageTplID) && inlay.config.followupText.length > 0" class="crm-message crm-error error message">
+                As you have specified follow up text, you must choose at the default message template.
+              </div>
+            </td>
+            <td>
+              <a ng-if="i > 0" href ng-click="inlay.config.followupMaps.splice(i, 1)">Delete</a>
+          </tr>
+          <tr>
+            <td><a href ng-click="inlay.config.followupMaps.push({reportTitle: '', messageTplID : ''})" >Add</a></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+
+    </div>
+    <br />
 
     <!--
       <pre>{{ inlay.config | json }}</pre>

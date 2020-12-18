@@ -24,7 +24,12 @@
                   ["workflow_id", "IS NULL"]
                 ],
                 orderBy: {msg_title: 'ASC'}},
-                'id']
+                'id'],
+              fromAddresses: ['OptionValue', 'get', {
+                select: ["label", "value"],
+                where: [["option_group_id:name", "=", "from_email_address"], ["is_active", "=", true]],
+                orderBy: {"is_default":"DESC"},
+              }],
             };
             if ($route.current.params.id > 0) {
               params.inlay = ['Inlay', 'get', {where: [["id", "=", $route.current.params.id]]}, 0];
@@ -51,6 +56,7 @@
     console.log({various}, $scope.inlayType);
     $scope.mailingGroups = various.groups;
     $scope.messageTpls = various.messageTpls;
+    $scope.fromAddresses = various.fromAddresses;
     if (various.inlay) {
       $scope.inlay = various.inlay;
     }
