@@ -27,7 +27,7 @@
         style="width: 100%"
         >
         <option ng-repeat="g in mailingGroups"
-                ng-value="g.id">{{g.title}}</option>
+                value="{{g.id}}">{{g.title}}</option>
       </select>
     </div>
 
@@ -59,7 +59,7 @@
         ng-model="inlay.config.welcomeEmailID"
         >
         <option value="">(Do not send an email)</option>
-        <option ng-repeat="i in messageTpls" ng-value="i.id">{{i.msg_title}} ({{i.msg_subject}})<option>
+        <option ng-repeat="i in messageTpls" value="{{i.id}}">{{i.msg_title}} ({{i.msg_subject}})<option>
       </select>
     </div>
 
