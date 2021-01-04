@@ -1,6 +1,5 @@
 <template>
   <div class="treeometer">
-    <span class="treeometer__bignum">{{ count.toLocaleString() }}</span>
     <span class="treeometer__words">{{stmt}}</span>
 
     <div class="treeometer__trees" ref="treesContainer">
@@ -27,7 +26,8 @@ export default {
   computed:{
     trees() {
       var max = this.containerSize;
-      var greenTo = parseInt(this.step * max * 0.7);
+      // Used to set 'target' at 70%, now at 100% as we're not really meaning it as a target.
+      var greenTo = parseInt(this.step * max * 1.0);
       const t = [];
       for (var i=0; i<max; i++) {
         t.push(i > greenTo ? 'faded' : '');
@@ -53,7 +53,6 @@ export default {
   },
   methods:{
     handleIntersectionChange(entries, observer) {
-      console.log("handleIntersectionChange");
       entries.forEach(e => {
         if (e.isIntersecting) {
           this.animStart = false;
@@ -108,13 +107,8 @@ export default {
     }
   }
 
-  .treeometer__bignum {
-    flex: 0 0 auto;
-    padding-right: 1rem;
-    font-size:3rem;
-  }
   .treeometer__words {
-    flex: 0 1 auto;
+    flex: 0 1 100%;
     font-size: 2rem;
   }
 }

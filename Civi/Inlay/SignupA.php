@@ -21,6 +21,7 @@ class SignupA extends InlayType {
     'mailingGroup'     => NULL,
     'target'           => NULL,
     'socials'          => ['twitter', 'facebook', 'email', 'whatsapp'],
+    'socialStyle'      => 'col-buttons', // col-buttons|col-icon|'',
     'tweet'            => '',
     'whatsappText'     => '',
     //'defaultMessage'   => NULL,
@@ -61,7 +62,7 @@ class SignupA extends InlayType {
       // Name of global Javascript function used to boot this app.
       'init'             => 'inlaySignupAInit',
     ];
-    foreach (['submitButtonText', 'publicTitle', 'smallprintHTML', 'webThanksHTML', 'instructionsHTML', // 'phoneAsk'
+    foreach (['socialStyle', 'submitButtonText', 'publicTitle', 'smallprintHTML', 'webThanksHTML', 'instructionsHTML', // 'phoneAsk'
     ] as $_) {
       $data[$_] = $this->config[$_] ?? '';
     }

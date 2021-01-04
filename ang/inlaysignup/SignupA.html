@@ -91,11 +91,25 @@
         >
         <option value="">(do not add them to a group)</option>
         <option ng-repeat="g in mailingGroups"
-                ng-value="g.id">{{g.title}}</option>
+                value="{{g.id}}">{{g.title}}</option>
       </select>
     </div>
 
     <h3>Social Media</h3>
+
+    <div crm-ui-field="{name: 'inlayForm.socialStyle', title: ts('Social media button colours')}">
+      <select
+        crm-ui-select="{allowClear:true, dropdownAutoWidth: true}"
+        ng-model="inlay.config.socialStyle"
+        name="socialStyle"
+        style="width: 100%"
+        >
+        <option value="">(no style)</option>
+        <option value="col-buttons">{{ts('Coloured button background, white icon')}}</option>
+        <option value="col-icon">{{ts('Coloured icon')}}</option>
+      </select>
+    </div>
+
     <ul>
       <li ng-repeat="(i, sm) in smShares"
         >

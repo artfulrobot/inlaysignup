@@ -6,7 +6,7 @@
     <ometer-sos-tree
       :count="countSigners"
       :target="target"
-      stmt="trees planted"
+      stmt="You’re helping us plant trees in Sumatra"
       ></ometer-sos-tree>
 
     <form action='#' @submit.prevent="submitForm" v-if="stage === 'form'">
@@ -82,7 +82,7 @@
 
     <div v-if="stage === 'thanks'">
       <div v-html="inlay.initData.webThanksHTML"></div>
-      <inlay-socials :socials="inlay.initData.socials" icons="1"></inlay-socials>
+      <inlay-socials :socials="inlay.initData.socials" icons="1" :button-style="inlay.initData.socialStyle"></inlay-socials>
     </div>
   </div>
 </template>
@@ -120,7 +120,7 @@
 
   label {
     display: block;
-    flex: 0 0 auto;
+    flex: 0 0 8rem;
     background: white;
   }
 
@@ -130,6 +130,10 @@
     flex: 1 0 10rem;
     width: 10rem; // needed
     background: transparent;
+  }
+
+  .isa-smallprint {
+    font-size: 0.825rem;
   }
 
   .isa-submit {
@@ -156,6 +160,7 @@ export default {
   props: ['inlay'],
   components: {InlayProgress, InlaySocials, OmeterSosTree},
   data() {
+    window.xx = this;
     const d = {
       stage: 'form',
       myId: this.$root.getNextId(),
@@ -169,11 +174,12 @@ export default {
   },
   computed: {
     target() {
+      return this.countSigners;
       // always at 70%
       return Math.floor((this.inlay.initData.count / 0.7) / 1000) * 1000 + 1000;
     },
     countSigners() {
-      return this.inlay.initData.count + (this.stage === 'thanks' ? 1 : 0);
+      return this.inlay.initData.count;//  + (this.stage === 'thanks' ? 1 : 0);
     }
   },
   methods: {
