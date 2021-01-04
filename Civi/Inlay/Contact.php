@@ -311,6 +311,7 @@ class Contact extends InlayType {
     $api = \Civi\Api4\Contact::get(FALSE)
       ->addSelect('legal_name', 'id')
       ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('display_name', '!=', 'AAA Test University')
       ->addWhere('contact_sub_type', 'IN', ['ACIHECollege', 'ACIUniversity'])
       ->addWhere('is_deleted', '=', FALSE)
     ;
