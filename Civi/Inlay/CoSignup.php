@@ -186,6 +186,12 @@ class CoSignup extends InlayType {
       }
     }
 
+    // origin is the URL of the page that the script is on.
+    $valid['origin'] = trim($data['origin']);
+    if (!preg_match('@^https?://@', $valid['origin'])) {
+      $valid['origin'] = '';
+    }
+
     // Country is required.
     $countryISO2Code = $data['country'] ?? 'GB';
     // Is it valid?
@@ -318,7 +324,7 @@ class CoSignup extends InlayType {
       'activity_type_id'  => "Consent",
       'subject'           => "Signed up to $groupName",
       'status_id'         => 'Completed',
-      // 'location'          => $this->request_body->source ?? '',
+      'location'          => $data['origin'],
       'details'           => "<p>Signed up to mailing list(s): " . htmlspecialchars($groupName) . " using the Signup Inlay called <em>"
                              . htmlspecialchars($this->getName()) . '</em><p>',
     ]);

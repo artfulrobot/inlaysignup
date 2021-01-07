@@ -15,7 +15,7 @@
             required
             type="text"
             :id="myId + 'fname'"
-            :name="first_name"
+            name="first_name"
             :ref="first_name"
             :disabled="$root.submissionRunning"
             v-model="first_name"
@@ -27,7 +27,7 @@
             required
             type="text"
             :id="myId + 'lname'"
-            :name="last_name"
+            name="last_name"
             :ref="last_name"
             :disabled="$root.submissionRunning"
             v-model="last_name"
@@ -42,7 +42,7 @@
             required
             type="email"
             :id="myId + 'email'"
-            :name="email"
+            name="email"
             :ref="email"
             :disabled="$root.submissionRunning"
             v-model="email"
@@ -55,7 +55,7 @@
             required
             type="email"
             :id="myId + 'email2'"
-            :name="email2"
+            name="email2"
             :ref="email2"
             :disabled="$root.submissionRunning"
             @input="validateEmail2"
@@ -71,7 +71,7 @@
             required
             type="text"
             :id="myId + 'organisation'"
-            :name="organisation"
+            name="organisation"
             :ref="organisation"
             :disabled="$root.submissionRunning"
             v-model="organisation"
@@ -83,7 +83,7 @@
           <select
             required
             :id="myId + 'country'"
-            :name="country"
+            name="country"
             :ref="country"
             :disabled="$root.submissionRunning"
             v-model="country"
@@ -234,7 +234,8 @@ export default {
         last_name: this.last_name,
         email: this.email,
         organisation: this.organisation,
-        country: this.country
+        country: this.country,
+        origin: window.location.href,
       };
 
       const progress = this.$refs.progress;
