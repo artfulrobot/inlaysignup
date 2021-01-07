@@ -92,6 +92,11 @@ ul.inlay-socials {
     flex: 1 0 auto;
     list-style: none;
 
+    // Reset any local styles that may have added this:
+    &::before {
+      content: none;
+    }
+
     &>a, &>a:hover, &>a:visited, &>a:active {
       text-decoration: none;
       border-radius: 4px;
