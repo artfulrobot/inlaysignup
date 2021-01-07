@@ -23,17 +23,17 @@
         />
     </div>
 
-    <!--
-    <div crm-ui-field="{name: 'inlayForm.instructionsHTML', title: ts('InstructionsHTML for user about the message field')}">
+    <div crm-ui-field="{name: 'inlayForm.introHTML', title: ts('Intro text introducing the form')}">
       <textarea
-        crm-ui-id="inlayForm.instructionsHTML"
+        crm-ui-id="inlayForm.introHTML"
         crm-ui-richtext
-        name="instructionsHTML"
-        ng-model="inlay.config.instructionsHTML"
+        name="introHTML"
+        ng-model="inlay.config.introHTML"
         class="crm-form-text"
         ></textarea>
     </div>
 
+    <!--
     <div crm-ui-field="{name: 'inlayForm.defaultMessage', title: ts('Default message (optional, useful for hinting what they should write.)')}">
       <textarea
         crm-ui-id="inlayForm.defaultMessage"
@@ -50,7 +50,6 @@
         ng-model="inlay.config.phoneAsk"
         />
     </div>
-    -->
 
     <div crm-ui-field="{name: 'inlayForm.smallprintHTML', title: ts('Text by submit button, e.g. explaining GDPR')}">
       <textarea
@@ -61,6 +60,7 @@
         class="crm-form-text"
         ></textarea>
     </div>
+    -->
 
     <div crm-ui-field="{name: 'inlayForm.submitButtonText', title: ts('submit button text')}">
       <input
@@ -91,7 +91,17 @@
         >
         <option value="">(do not add them to a group)</option>
         <option ng-repeat="g in mailingGroups"
-                ng-value="g.id">{{g.title}}</option>
+                value="{{g.id}}">{{g.title}}</option>
+      </select>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.welcomeEmailID', title: ts('Welcome email to send')}">
+      <select
+        style="width: 100%"
+        crm-ui-select="{dropdownAutoWidth: true, allowClear: true}"
+        ng-model="inlay.config.welcomeEmailID"
+        ng-options="i.msg_title + ' | ' + i.msg_subject for i in messageTpls track by i.id"
+        >
       </select>
     </div>
 

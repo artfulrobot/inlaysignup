@@ -1,10 +1,10 @@
 (function(angular, $, _) {
 
   angular.module('inlaysignup').config(function($routeProvider) {
-      $routeProvider.when('/inlays/signupA/:id', {
-        controller: 'InlaysignupSignupA',
+      $routeProvider.when('/inlays/CoSignup/:id', {
+        controller: 'InlaysignupCoSignup',
         controllerAs: '$ctrl',
-        templateUrl: '~/inlaysignup/SignupA.html',
+        templateUrl: '~/inlaysignup/CoSignup.html',
 
         // If you need to look up data when opening the page, list it out
         // under "resolve".
@@ -38,15 +38,15 @@
 
   // The controller uses *injection*. This default injects a few things:
   //   $scope -- This is the set of variables shared between JS and HTML.
-  angular.module('inlaysignup').controller('InlaysignupSignupA', function($scope, crmApi4, crmStatus, crmUiHelp, various) {
+  angular.module('inlaysignup').controller('InlaysignupCoSignup', function($scope, crmApi4, crmStatus, crmUiHelp, various) {
     // The ts() and hs() functions help load strings for this module.
     var ts = $scope.ts = CRM.ts('inlaysignup');
-    var hs = $scope.hs = crmUiHelp({file: 'CRM/inlaysignup/InlaySignupA'}); // See: templates/CRM/inlaysignup/InlaySignupA.hlp
+    // var hs = $scope.hs = crmUiHelp({file: 'CRM/inlaysignup/InlaySignupA'}); // See: templates/CRM/inlaysignup/InlaySignupA.hlp
     // Local variable for this controller (needed when inside a callback fn where `this` is not available).
     var ctrl = this;
 
     $scope.mailingGroups = various.groups;
-    $scope.inlayType = various.inlayTypes['Civi\\Inlay\\SignupA'];
+    $scope.inlayType = various.inlayTypes['Civi\\Inlay\\CoSignup'];
     console.log({various}, $scope.inlayType);
     $scope.mailingGroups = various.groups;
     $scope.messageTpls = various.messageTpls;
@@ -56,7 +56,7 @@
     }
     else {
       $scope.inlay = {
-        'class' : 'Civi\\Inlay\\SignupA',
+        'class' : 'Civi\\Inlay\\CoSignup',
         name: 'New ' + $scope.inlayType.name,
         public_id: 'new',
         id: 0,

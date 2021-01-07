@@ -15,9 +15,7 @@ function inlaysignup_civicrm_container($container) {
   //Civi::dispatcher()
   $container->findDefinition('dispatcher')
     ->addMethodCall('addListener', ['hook_inlay_registerType', [Civi\Inlay\CoDownload::class, 'register']])
-    //->addMethodCall('addListener', ['hook_inlay_registerType', [Civi\Inlay\InlaySignup::class, 'register']])
-    //->addMethodCall('addListener', ['hook_inlay_registerType', [Civi\Inlay\Contact::class, 'register']])
-    //->addMethodCall('addListener', ['hook_inlay_registerType', [Civi\Inlay\SignupA::class, 'register']])
+    ->addMethodCall('addListener', ['hook_inlay_registerType', [Civi\Inlay\CoSignup::class, 'register']])
   ;
 }
 

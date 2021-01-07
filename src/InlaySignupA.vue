@@ -1,18 +1,15 @@
 <template>
-  <div style="overflow:hidden;" class="inlay-signup-a">
-
-    <h2 v-if="inlay.initData.publicTitle">{{inlay.initData.publicTitle}}</h2>
-
-    <ometer-sos-tree
-      :count="countSigners"
-      :target="target"
-      stmt="trees planted"
-      ></ometer-sos-tree>
+  <div style="overflow:hidden;" class="inlay-signup-co isco">
 
     <form action='#' @submit.prevent="submitForm" v-if="stage === 'form'">
+      <h2 v-if="inlay.initData.publicTitle">{{inlay.initData.publicTitle}}</h2>
 
-      <div class="isa-2-cols">
-        <div class="isa-input-wrapper">
+      <div v-if="inlay.initData.introHTML"
+        class="isco-intro"
+        v-html="inlay.initData.introHTML"></div>
+
+      <div class="isco-2-cols">
+        <div class="isco-input-wrapper">
           <label :for="myId + 'fname'" >First name</label>
           <input
             required
@@ -24,7 +21,7 @@
             v-model="first_name"
             />
         </div>
-        <div class="isa-input-wrapper">
+        <div class="isco-input-wrapper">
           <label :for="myId + 'lname'" >Last name</label>
           <input
             required
@@ -38,17 +35,63 @@
         </div>
       </div>
 
-      <div class="isa-input-wrapper">
-        <label :for="myId + 'email'" >Email</label>
-        <input
-          required
-          type="email"
-          :id="myId + 'email'"
-          :name="email"
-          :ref="email"
-          :disabled="$root.submissionRunning"
-          v-model="email"
-          />
+      <div class="isco-2-cols">
+        <div class="isco-input-wrapper">
+          <label :for="myId + 'email'" >Email</label>
+          <input
+            required
+            type="email"
+            :id="myId + 'email'"
+            :name="email"
+            :ref="email"
+            :disabled="$root.submissionRunning"
+            v-model="email"
+            />
+        </div>
+
+        <div class="isco-input-wrapper">
+          <label :for="myId + 'email'" >Email again</label>
+          <input
+            required
+            type="email"
+            :id="myId + 'email2'"
+            :name="email2"
+            :ref="email2"
+            :disabled="$root.submissionRunning"
+            @input="validateEmail2"
+            v-model="email2"
+            />
+        </div>
+      </div>
+
+      <div class="isco-2-cols">
+        <div class="isco-input-wrapper">
+          <label :for="myId + 'organisation'" >Organisation</label>
+          <input
+            required
+            type="text"
+            :id="myId + 'organisation'"
+            :name="organisation"
+            :ref="organisation"
+            :disabled="$root.submissionRunning"
+            v-model="organisation"
+            />
+        </div>
+
+        <div class="isco-input-wrapper">
+          <label :for="myId + 'country'" >Country</label>
+          <select
+            required
+            :id="myId + 'country'"
+            :name="country"
+            :ref="country"
+            :disabled="$root.submissionRunning"
+            v-model="country"
+            >
+            <option v-for="c in inlay.initData.countries"
+                    :value="c[0]">{{c[1]}}</option>
+          </select>
+        </div>
       </div>
 
       <!--
@@ -63,13 +106,13 @@
           v-model="phone"
           />
       </div>
-      -->
 
-      <div class="isa-smallprint"
+      <div class="isco-smallprint"
         v-if="inlay.initData.smallprintHTML"
         v-html="inlay.initData.smallprintHTML"></div>
+      -->
 
-      <div class="isa-submit">
+      <div class="isco-submit">
         <button
          @click="wantsToSubmit"
          :disabled="$root.submissionRunning"
@@ -77,6 +120,8 @@
           >{{ $root.submissionRunning ? "Please wait.." : inlay.initData.submitButtonText }}</button>
         <inlay-progress ref="progress"></inlay-progress>
       </div>
+
+      <div class="isco-error">{{ error }}</div>
 
     </form>
 
@@ -89,8 +134,8 @@
 <style lang="scss">
   $orange: #f67f00;
   $yellow: #ffc839;
-.inlay-signup-a {
-  .isa-2-cols {
+.inlay-signup-co {
+  .isco-2-cols {
     margin-left: -1rem;
     margin-right: -1rem;
     display: flex;
@@ -102,59 +147,44 @@
     }
   }
 
-  .isa-input-wrapper {
-    display: flex;
-    flex-wrap:wrap;
+  .isco-intro {
+    font-size: 1.3125rem;
+  }
+
+  .isco-input-wrapper {
     margin-bottom: 1rem;
   }
   input[type="text"],
   input[type="email"],
-  label {
-    border: solid 2px white;
-    box-shadow: 0 4px 0 rgba(0,0,0,.2);
-    padding: 0.75rem 1rem;
-    line-height:1;
-    margin: 0;
-    font-size: 1.1rem;
-  }
-
+  select,
   label {
     display: block;
-    flex: 0 0 auto;
-    background: white;
+    box-sizing: border-box;
+    width: 100%;
   }
 
-  input[type="text"],
-  input[type="email"]
-  {
-    flex: 1 0 10rem;
-    width: 10rem; // needed
-    background: transparent;
-  }
-
-  .isa-submit {
+  .isco-submit {
     text-align: center;
 
     button {
-      font-size: 1.1rem;
-      background: $yellow;
-      &:hover {
-        background: $orange;
-      }
+      // font-size: 1.1rem;
+      // background: $yellow;
+      // &:hover { background: $orange; }
     }
+  }
+
+  .isco-error {
+    color: #a00;
   }
 }
 </style>
 <script>
 import InlayProgress from './InlayProgress.vue';
 import InlaySocials from './InlaySocials.vue';
-import OmeterSosTree from './OmeterSosTree.vue';
-// import 'vue-select/dist/vue-select.css';
-// import vSelect from 'vue-select';
 
 export default {
   props: ['inlay'],
-  components: {InlayProgress, InlaySocials, OmeterSosTree},
+  components: {InlayProgress, InlaySocials},
   data() {
     const d = {
       stage: 'form',
@@ -163,7 +193,11 @@ export default {
       first_name: '',
       last_name: '',
       email: '',
-      phone: ''
+      email2: '',
+      organisation: '',
+      country: 'GB',
+
+      error: ''
     };
     return d;
   },
@@ -177,8 +211,20 @@ export default {
     }
   },
   methods: {
-    wantsToSubmit() {
+    wantsToSubmit(e) {
       // validate all fields.
+      if (!this.validateEmail2()) {
+        e.preventDefault();
+        return;
+      }
+    },
+    validateEmail2() {
+      if (this.email != this.email2) {
+        this.error = 'Emails do not match';
+        return false;
+      }
+      this.error = '';
+      return true;
     },
     submitForm() {
       // Form is valid according to browser.
@@ -187,7 +233,8 @@ export default {
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
-        phone: this.phone
+        organisation: this.organisation,
+        country: this.country
       };
 
       const progress = this.$refs.progress;
