@@ -22,6 +22,7 @@ class CoSignup extends InlayType {
     'webThanksHTML'    => NULL,
     'mailingGroup'     => NULL,
     'socials'          => ['twitter', 'facebook', 'email', 'whatsapp'],
+    'socialStyle'      => 'col-buttons', // col-buttons|col-icon|'',
     'tweet'            => '',
     'whatsappText'     => '',
     'welcomeEmailID'   => NULL,
@@ -68,6 +69,7 @@ class CoSignup extends InlayType {
       'submitButtonText',
       // 'smallprintHTML',
       'webThanksHTML',
+      'socialStyle',
       //'instructionsHTML', // 'phoneAsk'
     ] as $_) {
       $data[$_] = $this->config[$_] ?? '';

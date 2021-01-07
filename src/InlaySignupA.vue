@@ -127,7 +127,7 @@
 
     <div v-if="stage === 'thanks'">
       <div v-html="inlay.initData.webThanksHTML"></div>
-      <inlay-socials :socials="inlay.initData.socials" icons="1"></inlay-socials>
+      <inlay-socials :socials="inlay.initData.socials" icons="1" :button-style="inlay.initData.socialStyle"></inlay-socials>
     </div>
   </div>
 </template>
