@@ -124,7 +124,7 @@ HTML;
       'details'           => $details,
     ])['id'];
 
-    if ($this->config['followupText'] && $this->config['followupMessageTemplateID'] && $data['followup'] === 'Yes') {
+    if ($this->config['followupText'] && $data['followup'] === 'Yes') {
 
       $date = $this->getSuitableFollowupDate();
       $result = civicrm_api3('Activity', 'create', [
@@ -135,7 +135,7 @@ HTML;
         'activity_type_id'   => self::ACTIVITY_TYPE_ID_FOLLOWUP,
         'subject'            => "Follow up: " . $data['reportTitle'],
         'status_id'          => 'Scheduled',
-        'details'            => '<p>If this activity is scheduled, then on its date an automatic email will be sent to this contact to follow up on the report. If this activity is Completed, that email has been sent.</p><p>If scheduled, you can cancel this follow up by deleting this activity.</p>',
+        'details'            => '<p>This scheduled activity means that on its date an automatic email will be sent to this contact to follow up on the report. Which followup gets sent depends on the configuration at the time.</p><p>You can cancel this follow up by deleting this activity.</p>',
       ]);
     }
 
@@ -241,8 +241,13 @@ HTML;
       }
     }
 
+    // Fetch the name and title of the message template. This also checks it exists.
+    $msgTpl = civicrm_api3('MessageTemplate', 'getsingle', ['return' => ['msg_title', 'msg_subject'], 'id' => $messageTemplateID]);
+
     // send the email.
     // Get the From address.
+    // By default, use default values.
+    list($fromName, $fromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     if ($this->config['followupMessageFromID']) {
       // Try to load the specified entry.
       $combined = \Civi\Api4\OptionValue::get(FALSE)
@@ -252,17 +257,18 @@ HTML;
         ->addWhere('is_active', '=', TRUE)
         ->addWhere('value', '=', (int) $this->config['followupMessageFromID'])
         ->execute()->first()['label'] ?? NULL;
-    }
-    if (empty($combined)) {
-      // Nothing configured, or loading the configured address failed.
-      // Load default.
-      list($fromName, $fromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
-    }
-    else {
-      // Split $combined up.
-      $fromEmail = \CRM_Utils_Mail::pluckEmailFromHeader($combined);
-      $_ = explode('"', $combined);
-      $fromName = $_[1] ?? NULL;
+      if (!empty($combined)) {
+        // Nothing configured, or loading the configured address failed.
+        // Load default.
+        $_ = \CRM_Utils_Mail::pluckEmailFromHeader($combined);
+        if ($_) {
+          $fromEmail = $_;
+        }
+        $_ = explode('"', $combined);
+        if (!empty($_[1])) {
+          $fromName = $_[1];
+        }
+      }
     }
 
     // Load the target contact.
@@ -273,6 +279,8 @@ HTML;
       'contact_id'      => $targetContactID,
       'disable_smarty'  => 1,
       'subject'         => $activity['subject'],
+      'from_email'      => $fromEmail,
+      'from_name'       => $fromName,
     ];
     Civi::log()->info("Sending email with: " . json_encode($emailApiParams, JSON_PRETTY_PRINT));
     $result = civicrm_api3('Email', 'send', $emailApiParams);
@@ -281,6 +289,11 @@ HTML;
     $activityUpdateParams = [
       'activity_id'        => $activity['id'],
       'activity_status_id' => 'Completed',
+      'details'            => '<p>Sent message template titled <em>'
+        . htmlspecialchars($msgTpl['msg_title'])
+        . '</em> with subject <em>'
+        . htmlspecialchars($msgTpl['msg_subject'])
+        . '</em> at ' . date('H:i j M Y') .  '</p>',
     ];
     civicrm_api3('Activity', 'create', $activityUpdateParams);
 
