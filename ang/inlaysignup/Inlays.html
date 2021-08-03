@@ -16,8 +16,62 @@
         ng-model="inlay.name"
         class="crm-form-text"
         placeholder="{{ts('Our lovely signup form')}}"
+        size=60
         />
     </div>
+
+    <div crm-ui-field="{name: 'inlayForm.title', title: ts('Public title')}">
+      <input
+        crm-ui-id="inlayForm.title"
+        name="title"
+        ng-model="inlay.config.title"
+        class="crm-form-text"
+        size=60
+        placeholder="{{ts('e.g. Signup for our lovely emails')}}"
+        />
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.introHTML', title: ts('Intro text (optional)')}">
+      <textarea
+        crm-ui-id="inlayForm.introHTML"
+        crm-ui-richtext
+        name="introHTML"
+        ng-model="inlay.config.introHTML"
+        class="crm-form-text"
+        ></textarea>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.submitButtonText', title: ts('Signup button text')}">
+      <input
+        crm-ui-id="inlayForm.submitButtonText"
+        name="submitButtonText"
+        ng-model="inlay.config.submitButtonText"
+        class="crm-form-text"
+        placeholder="{{ts('e.g. Sign up')}}"
+        />
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.smallprintHTML', title: ts('Text by submit button, e.g. explaining GDPR')}">
+      <textarea
+        crm-ui-id="inlayForm.smallprintHTML"
+        crm-ui-richtext
+        name="smallprintHTML"
+        ng-model="inlay.config.smallprintHTML"
+        class="crm-form-text"
+        ></textarea>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.webThanksHTML', title: ts('Thank you text for website')}">
+      <textarea
+        crm-ui-id="inlayForm.webThanksHTML"
+        crm-ui-richtext
+        name="webThanksHTML"
+        ng-model="inlay.config.webThanksHTML"
+        class="crm-form-text"
+        ></textarea>
+    </div>
+
+    <h2>Processing submissions</h2>
 
     <div crm-ui-field="{name: 'inlayForm.mailingGroup', title: ts('Mailing Group to add contact to')}">
       <select
@@ -31,25 +85,6 @@
       </select>
     </div>
 
-    <div crm-ui-field="{name: 'inlayForm.smallprintHTML', title: ts('Text by submit button, e.g. explaining GDPR')}">
-      <textarea
-        crm-ui-id="inlayForm.smallprintHTML"
-        crm-ui-richtext
-        name="smallprintHTML"
-        ng-model="inlay.config.smallprintHTML"
-        class="crm-form-text"
-        ></textarea>
-    </div>
-
-    <div crm-ui-field="{name: 'inlayForm.signupButtonText', title: ts('Signup button text')}">
-      <input
-        crm-ui-id="inlayForm.signupButtonText"
-        name="signupButtonText"
-        ng-model="inlay.config.signupButtonText"
-        class="crm-form-text"
-        placeholder="{{ts('e.g. Sign up')}}"
-        />
-    </div>
 
     <div crm-ui-field="{name: 'inlayForm.welcomeEmailID', title: ts('Welcome email to send')}">
       <select
@@ -62,17 +97,6 @@
         <option ng-repeat="i in messageTpls" value="{{i.id}}">{{i.msg_title}} ({{i.msg_subject}})<option>
       </select>
     </div>
-
-    <div crm-ui-field="{name: 'inlayForm.webThanksHTML', title: ts('Thank you text for website')}">
-      <textarea
-        crm-ui-id="inlayForm.webThanksHTML"
-        crm-ui-richtext
-        name="webThanksHTML"
-        ng-model="inlay.config.webThanksHTML"
-        class="crm-form-text"
-        ></textarea>
-    </div>
-
     <!--
       <pre>{{ inlay.config | json }}</pre>
       <div crm-ui-accordion="{title: ts('Greeting')}">

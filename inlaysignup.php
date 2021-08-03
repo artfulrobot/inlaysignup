@@ -12,11 +12,8 @@ use CRM_Inlaysignup_ExtensionUtil as E;
  */
 function inlaysignup_civicrm_container($container) {
   // https://docs.civicrm.org/dev/en/latest/hooks/usage/symfony/
-  //Civi::dispatcher()
   $container->findDefinition('dispatcher')
     ->addMethodCall('addListener', ['hook_inlay_registerType', [Civi\Inlay\InlaySignup::class, 'register']])
-    ->addMethodCall('addListener', ['hook_inlay_registerType', [Civi\Inlay\Contact::class, 'register']])
-    ->addMethodCall('addListener', ['hook_inlay_registerType', [Civi\Inlay\SignupA::class, 'register']])
   ;
 }
 

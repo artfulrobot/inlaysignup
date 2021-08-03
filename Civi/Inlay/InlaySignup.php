@@ -9,14 +9,17 @@ use CRM_Inlaysignup_ExtensionUtil as E;
 
 class InlaySignup extends InlayType {
 
-  public static $typeName = 'Signup form';
+  public static $typeName = 'Simple Signup form';
 
   public static $defaultConfig = [
-    'signupButtonText' => 'Sign up',
+    'title'            => 'Sign up',
+    'introHTML'        => NULL,
+    'submitButtonText' => 'Sign up',
     'smallprintHTML'   => NULL,
+    'webThanksHTML'    => NULL,
+
     'mailingGroup'     => NULL,
     'welcomeEmailID'   => NULL,
-    'webThanksHTML'    => NULL,
   ];
 
   /**
@@ -50,9 +53,11 @@ class InlaySignup extends InlayType {
     return [
       // Name of global Javascript function used to boot this app.
       'init'             => 'inlaySignupInit',
-      'signupButtonText' => $this->config['signupButtonText'],
-      'webThanksHTML'    => $this->config['webThanksHTML'],
+      'title'            => $this->config['title'],
+      'introHTML'        => $this->config['introHTML'],
+      'submitButtonText' => $this->config['submitButtonText'],
       'smallprintHTML'   => $this->config['smallprintHTML'],
+      'webThanksHTML'    => $this->config['webThanksHTML'],
     ];
   }
 
@@ -93,31 +98,28 @@ class InlaySignup extends InlayType {
       ->setLimit(1)
       ->execute();
 
-    // Add to group.
+
+    // Call out to a hook to let local changes happen.
+    // Create an event object with all the data you want to pass in.
+    // Hook implementations can set handledByHook entries to TRUE if they take
+    // responsiblity for implementing that.
+    $handledByHook = [
+      'addToGroup' => FALSE,
+      'welcomeMailing' => FALSE,
+    ];
+    $event = Civi\Core\Event\GenericHookEvent::create(['input' => $data, 'inlay' => $this, 'contactID' => $contactID, 'handledByHook' => &$handledByHook]);
+    \Civi::dispatcher()->dispatch('civi.inlaysignup.submission', $event);
+
+    // Add to group. If we have one configured, and if this wasn't handled by the hook.
     $groupID = $this->config['mailingGroup'];
-    list($total, $added, $notAdded) = \CRM_Contact_BAO_GroupContact::addContactsToGroup([$contactID], $groupID, 'Web', 'Added');
-
-    // Record consent.
-    $emailConsentGroup = \Civi\Api4\Group::get(FALSE)
-        ->addSelect('id')
-        ->addWhere('name', '=', 'consent_all_email')
-        ->execute()
-        ->first()['id'] ?? NULL;
-    if (!$emailConsentGroup) {
-      Civi::log()->error("Failed to find consent_all_email Group; was going to add contact $contactID into it as they signed up.");
+    if (empty($handledByHook['addToGroup']) && $groupID) {
+      list($total, $added, $notAdded) = \CRM_Contact_BAO_GroupContact::addContactsToGroup([$contactID], $groupID, 'Web', 'Added');
     }
-    else {
-      list($total, $added, $notAdded) = \CRM_Contact_BAO_GroupContact::addContactsToGroup([$contactID], $emailConsentGroup, 'Web', 'Added');
+
+    // Send welcome mailing, unless already handled by hook.
+    if (empty($handledByHook['addToGroup'])) {
+      $this->sendWelcomeEmail($contactID, $data);
     }
-    \CRM_Gdpr_SLA_Utils::recordSLAAcceptance($contactID);
-    \CRM_Gdpr_CommunicationsPreferences_Utils::createCommsPrefActivity($contactID, ['activity_source' => "Subscribed via InlaySignup '" . htmlspecialchars($this->instanceData['name']) . "'"]);
-
-    // @todo make PR for adding source elsewhere than details (which is a big text blob that can't be indexed.)
-    // Also, possibly see CRM_Gdpr_CommunicationPrefs_Utils::updateCommsPrefByFormValues($contactID, $submittedValues)
-    // but it's crude and does not allow for a subset of groups.
-
-    // Send welcome mailing.
-    $this->sendWelcomeEmail($contactID, $data);
 
     return [ 'success' => 1 ];
   }
@@ -147,6 +149,14 @@ class InlaySignup extends InlayType {
         }
       }
     }
+
+    // Loosely validate source against angle brackets.
+    $valid['source'] = trim($data['source'] ?? '');
+    if ($valid['source'] && !preg_match('@^[^<>]+$@', $valid['source'])) {
+      $valid['source'] = '';
+      $errors[] = "Invalid request (this should not happen) SRC1";
+    }
+
     if ($errors) {
       throw new \Civi\Inlay\ApiException(400, ['error' => implode(', ', $errors)]);
     }
@@ -174,6 +184,7 @@ class InlaySignup extends InlayType {
 
   public function sendWelcomeEmail($contactID, $valid) {
     if (!$this->config['welcomeEmailID']) {
+      // Not configured to send an email.
       return;
     }
 
@@ -198,7 +209,7 @@ class InlaySignup extends InlayType {
         'to_email'   => $valid['email'],
         'contact_id' => $contactID,
         'disable_smarty' => 1,
-        //'bcc'        => "forums@artfulrobot.uk", // so I can keep an eye.
+        //'bcc'        => "you@example.org", // so I can keep an eye.
         //'template_params' => []
       ];
 
@@ -254,7 +265,7 @@ class InlaySignup extends InlayType {
    * @return string Content of a Javascript file.
    */
   public function getExternalScript() {
-    return file_get_contents(E::path('dist/inlay-signup.js'));
+    return file_get_contents(E::path('dist/inlaysignup.js'));
   }
 
 }
