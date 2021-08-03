@@ -27,11 +27,13 @@ mix
               loose: true,
               // No need for babel to resolve modules
               modules: false,
-              //targets: "> 0.5%, not dead, not IE 11"
-              targets: {
-                // ! Very important. Target es6+
-                esmodules: true,
-              }
+              // This seems to be the most browsers we can support without triggering
+              // warnings and requiring <svelte:options accessors={true}/>
+              targets: "> 0.35%, not dead, not IE<=11"
+              // targets: {
+              //   // ! Very important. Target es6+
+              //   esmodules: true,
+              // }
             },
           ],
         ],
