@@ -19,7 +19,6 @@ mix
       // The JS gets transpiled to es6, before svelte compiles it
       // I don't know whether Mix then further babels the finished js?
       // I don't think I need to support
-      /*
       babel: {
         presets: [
           [
@@ -37,7 +36,6 @@ mix
           ],
         ],
       },
-      */
     }),
   })
 ;

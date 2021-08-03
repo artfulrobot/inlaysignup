@@ -1,3 +1,5 @@
+<!-- the following line is required while using babel -->
+<svelte:options accessors={true}/>
 <script>
   import { tweened } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
@@ -40,6 +42,7 @@
 </script>
 
 <progress value={$percent/100} class:running />
+
 
 <style>
   progress {
