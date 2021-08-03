@@ -22,7 +22,9 @@
   $: {
     if (!dismissedThisSession) {
       if (!hasScrolledDown) {
-        if (+windowScrollY > document.body.scrollHeight/2) {
+        const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
+
+        if (Math.floor(windowScrollY/(document.body.scrollHeight - vh)*100) >= inlay.initData.minScrollPercent) {
           hasScrolledDown = true;
         }
         lastScrollY = windowScrollY;
@@ -37,7 +39,7 @@
 
   // Handler for document mouseout
   const mouseOut = e => {
-    if ((new Date() - pageLoadedTime) < 10000) {
+    if ((new Date() - pageLoadedTime) < inlay.initData.notBefore * 1000) {
       // Don't do anything until they've been on the page 10s.
       return;
     }
@@ -60,6 +62,13 @@
     }
     else {
       console.log("We will not offer you a signup pop-up because you have previously declined. Unset your declinedSignup cookie to reset this.");
+    }
+
+    if (inlay.initData.customCSS.replace(/\s+/, '') && !document.getElementById('custom-style-' + inlay.publicID)) {
+      let customStyle = document.createElement('style');
+      customStyle.id = 'custom-style-' + inlay.publicID;
+      customStyle.textContent = inlay.initData.customCSS;
+      document.head.insertAdjacentElement('beforeend', customStyle);
     }
   });
 
@@ -195,6 +204,8 @@
     right: 0;
     width: 23rem;
     height: auto;
+    max-height: 100vh;
+    overflow-y: auto;
     background: white;
     transform: translateY(10%);
     opacity: 0;
@@ -212,9 +223,6 @@
     margin: 0 3rem 1rem 0;
     font-size: 1.4rem;
     margin-right: 3rem;
-    font-family: 'Libre Baskerville';
-    font-weight: 700;
-    text-align: center;
   }
 
   form>div {
@@ -234,7 +242,6 @@
   article.inlay-signup-overlay :global(.intro),
   article.inlay-signup-overlay :global(.intro p)
   {
-    font-family: 'Libre Baskerville';
     font-size: 1rem; /* 16px */
     margin-bottom: 0;
   }
@@ -262,8 +269,6 @@
 
   button.submit {
     width: 100%;
-    /* this copied from the screenshot */
-    background: #333E45;
   }
 
   button.dismiss {

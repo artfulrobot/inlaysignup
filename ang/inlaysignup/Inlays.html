@@ -71,31 +71,87 @@
         ></textarea>
     </div>
 
-    <h2>Processing submissions</h2>
+    <div crm-ui-accordion="{title: ts('UX Tweaks'), collapsed: true}">
+      <div crm-ui-field="{name: 'inlayForm.notBefore', title: ts('Wait how many seconds before allowing a pop-up')}">
+        <input
+          crm-ui-id="inlayForm.notBefore"
+          name="notBefore"
+          ng-model="inlay.config.notBefore"
+          class="crm-form-text"
+          type="number"
+          min=0
+          />
+      </div>
 
-    <div crm-ui-field="{name: 'inlayForm.mailingGroup', title: ts('Mailing Group to add contact to')}">
-      <select
-        crm-ui-select="{placeholder:'Something',allowClear:true, dropdownAutoWidth: true}"
-        ng-model="inlay.config.mailingGroup"
-        name="mailingGroup"
-        style="width: 100%"
-        >
-        <option ng-repeat="g in mailingGroups"
-                value="{{g.id}}">{{g.title}}</option>
-      </select>
+      <div crm-ui-field="{name: 'inlayForm.minScrollPercent', title: ts('Scrolling threshold % before triggering pop-up')}">
+        <input
+          crm-ui-id="inlayForm.minScrollPercent"
+          name="minScrollPercent"
+          ng-model="inlay.config.minScrollPercent"
+          class="crm-form-text"
+          type="number"
+          min=0
+          max=100
+          />
+        <p class="description">Detect when a user has read enough of an article
+          by how far they have scrolled as a % of document height. The pop-up
+          is triggered only when this threshold has been reached, and
+          <em>then</em> the user begins scrolling up.</p>
+      </div>
+
+      <div crm-ui-field="{name: 'inlayForm.css', title: ts('Insert custom CSS (danger!)')}">
+        <textarea
+          crm-ui-id="inlayForm.customCSS"
+          name="customCSS"
+          ng-model="inlay.config.customCSS"
+          class="crm-form-text"
+          ></textarea>
+        <p class="description">Hints:
+          <pre>
+/* Title */
+.inlay-signup-overlay h1 { }
+/* Intro text */
+.inlay-signup-overlay .intro { }
+/* Smallprint text */
+.inlay-signup-overlay .smallprint { }
+/* button */
+.inlay-signup-overlay .submit button.submit { background-color: #ffcc00; color: black; }
+/* thanks text */
+.inlay-signup-overlay .thanks { }
+          </pre>
+          Note that making mistakes here could mess up the style of your whole website.
+        </p>
+      </div>
+
     </div>
 
 
-    <div crm-ui-field="{name: 'inlayForm.welcomeEmailID', title: ts('Welcome email to send')}">
-      <select
-        crm-ui-select="{allowClear:true, dropdownAutoWidth: true}"
-        name="welcomeEmailID"
-        style="width: 100%"
-        ng-model="inlay.config.welcomeEmailID"
-        >
-        <option value="">(Do not send an email)</option>
-        <option ng-repeat="i in messageTpls" value="{{i.id}}">{{i.msg_title}} ({{i.msg_subject}})<option>
-      </select>
+    <div crm-ui-accordion="{title: ts('Processing'), collapsed: false}">
+
+      <div crm-ui-field="{name: 'inlayForm.mailingGroup', title: ts('Mailing Group to add contact to')}">
+        <select
+          crm-ui-select="{placeholder:'Something',allowClear:true, dropdownAutoWidth: true}"
+          ng-model="inlay.config.mailingGroup"
+          name="mailingGroup"
+          style="width: 100%"
+          >
+          <option ng-repeat="g in mailingGroups"
+                  value="{{g.id}}">{{g.title}}</option>
+        </select>
+      </div>
+
+
+      <div crm-ui-field="{name: 'inlayForm.welcomeEmailID', title: ts('Welcome email to send')}">
+        <select
+          crm-ui-select="{allowClear:true, dropdownAutoWidth: true}"
+          name="welcomeEmailID"
+          style="width: 100%"
+          ng-model="inlay.config.welcomeEmailID"
+          >
+          <option value="">(Do not send an email)</option>
+          <option ng-repeat="i in messageTpls" value="{{i.id}}">{{i.msg_title}} ({{i.msg_subject}})<option>
+        </select>
+      </div>
     </div>
     <!--
       <pre>{{ inlay.config | json }}</pre>

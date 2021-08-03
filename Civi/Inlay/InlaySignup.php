@@ -17,6 +17,9 @@ class InlaySignup extends InlayType {
     'submitButtonText' => 'Sign up',
     'smallprintHTML'   => NULL,
     'webThanksHTML'    => NULL,
+    'minScrollPercent' => 40,
+    'notBefore'        => 10,
+    'customCSS'        => '',
 
     'mailingGroup'     => NULL,
     'welcomeEmailID'   => NULL,
@@ -58,6 +61,9 @@ class InlaySignup extends InlayType {
       'submitButtonText' => $this->config['submitButtonText'],
       'smallprintHTML'   => $this->config['smallprintHTML'],
       'webThanksHTML'    => $this->config['webThanksHTML'],
+      'notBefore'        => $this->config['notBefore'],
+      'minScrollPercent' => $this->config['minScrollPercent'],
+      'customCSS'        => $this->config['customCSS'],
     ];
   }
 
