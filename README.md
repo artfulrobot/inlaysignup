@@ -1,8 +1,22 @@
 # inlaysignup
 
-![Screenshot](/images/screenshot.png)
+This is a custom branch for a particular client. You can fork it and hack it to do the will of your own site, but it's only publicly useful as an example.
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+## Usage
+
+Create an Inlay at the Civi end as usual.
+
+Add the Inlay's `<script>` tag on the pages you need it on the website. **Also**, wherever you want a Download button to appear, add a tag like this:
+
+```
+<noscript
+  data-inlay-id={ourID, e.g. "aabb112233"}
+  data-download-title="Example report Sep 2021"
+  data-download-id={e.g. "1234"}
+>You need javascript enabled to access this</noscript>
+```
+
+The actual download must be a publicly accessible URL on your website at `/download/{downloadID}`. In this regard, this Inlay is not suitable for protecting *sensitive* data, since it's easy for someone to look at how it works and get the download without supplying info.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
