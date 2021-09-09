@@ -129,4 +129,13 @@ body.inlay-download-modal-active {
     color: $orange;
     text-decoration: underline;
   }
+
+  // This class is only added when a warning exists.
+  .idl-warning {
+    background-color: $orange;
+    color: white;
+    padding: 0.5rem 1rem;
+
+    p:last-child { margin-bottom: 0; }
+  }
 }

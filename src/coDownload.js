@@ -28,7 +28,7 @@ import './coDownload.scss';
       inlay.booted = true;
       const uniquePrefix = 'i' + inlay.publicID;
       var isActive = false;
-      var report = { title: '', id: 0 };
+      var report = { title: '', id: 0, warning: '' };
 
       function getFormData(token) {
         const d = {
@@ -53,7 +53,13 @@ import './coDownload.scss';
           // First time we're moving to active.
           report.title = d.dataset.downloadTitle;
           report.id = d.dataset.downloadId;
+          report.warning = (d.dataset.downloadWarning || '').replace(/^\s*/, '').replace(/\s*$/, '');
+          console.log(d);
           nodes.title.textContent = 'Download: ' + d.dataset.downloadTitle;
+          if (report.warning) {
+            nodes.warningDiv.classList.add('idl-warning');
+            nodes.warningDiv.innerHTML = report.warning;
+          }
           downloadAppDiv.classList.remove('at-rest');
           downloadAppDiv.classList.add('focussed');
           document.body.classList.add('inlay-download-modal-active');
@@ -113,6 +119,7 @@ import './coDownload.scss';
           <button class="idl-close" title="Close this form">×</button>
           <form action='#' >
             <h2 class="idl-title"></h2>
+            <div class="idl-warning-placeholder"></div>
             <div class="idl-field first_name">
               <label for="${uniquePrefix}-fn">First name<sup class="red" title="required">*</sup></label>
               <input
@@ -205,6 +212,7 @@ import './coDownload.scss';
         overlay: downloadAppDiv.firstElementChild,
         emailInput: downloadAppDiv.querySelector('input[name="email"]'),
         title: downloadAppDiv.querySelector('.idl-title'),
+        warningDiv: downloadAppDiv.querySelector('.idl-warning-placeholder'),
         email2Input: downloadAppDiv.querySelector('input[name="email2"]'),
         firstNameInput: downloadAppDiv.querySelector('input[name="first_name"]'),
         lastNameInput: downloadAppDiv.querySelector('input[name="last_name"]'),
