@@ -49,6 +49,10 @@ body.inlay-download-modal-active {
     background: white;
     color: #888;
     border: none;
+    &:hover, &:active {
+      background: $orange;
+      color: white;
+    }
   }
   .idl-thanks {
     font-size: 1.6rem;
@@ -135,6 +139,8 @@ body.inlay-download-modal-active {
     background-color: $orange;
     color: white;
     padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
 
     p:last-child { margin-bottom: 0; }
   }
