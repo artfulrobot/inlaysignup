@@ -1,6 +1,6 @@
 let mix = require('laravel-mix');
 
-require('laravel-mix-bundle-analyzer');
+//require('laravel-mix-bundle-analyzer');
 if (false && !mix.inProduction()) {
     mix.bundleAnalyzer();
 }
@@ -11,6 +11,7 @@ mix
   .js('src/contact.js', 'dist/inlay-contact.js')
   .js('src/signupA.js', 'dist/inlay-signup-a.js')
   .js('src/coDownload.js', 'dist/inlay-coDownload.js')
+  .vue({version: 2})
 ;
 
 // Full API
