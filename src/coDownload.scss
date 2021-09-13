@@ -1,5 +1,6 @@
 $bg: #F8F8F5;
 $orange: #f25d2a;
+$bgDark: #2f2831;
 
 body.inlay-download-modal-active {
   position: fixed;
@@ -136,11 +137,16 @@ body.inlay-download-modal-active {
 
   // This class is only added when a warning exists.
   .idl-warning {
-    background-color: $orange;
+    background-color: $bgDark;
     color: white;
     padding: 0.5rem 1rem;
     margin-bottom: 1rem;
     border-radius: 6px;
+
+    strong {
+      color: $orange;
+      font-weight: bold;
+    }
 
     p:last-child { margin-bottom: 0; }
   }
