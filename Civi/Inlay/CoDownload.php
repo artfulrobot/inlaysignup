@@ -126,7 +126,15 @@ HTML;
 
     if ($this->config['followupText'] && $data['followup'] === 'Yes') {
 
-      $date = $this->getSuitableFollowupDate();
+      $followupAlteration = '+2 months';
+      if ($data['reportTitle'] === 'Britain Talks COP26') {
+        $followupAlteration = '+5 weeks';
+      }
+      elseif ($data['reportTitle'] === 'Engaging different audiences around COP26: a guide for UK-based climate advocates') {
+        $followupAlteration = '+5 weeks';
+      }
+
+      $date = $this->getSuitableFollowupDate(NULL, $followupAlteration);
       $result = civicrm_api3('Activity', 'create', [
         'parent_id'          => $downloadActivityID, /* This is a followup */
         'source_contact_id'  => $contactID,
@@ -304,7 +312,7 @@ HTML;
    * @return ?string parsable date string or NULL for now
    * @return string date in Y-m-d format
    */
-  public function getSuitableFollowupDate($from=NULL) {
+  public function getSuitableFollowupDate($from=NULL, string $followupAlteration = '+2 months') {
     if ($from === NULL) {
       $from = 'today';
     }
@@ -326,7 +334,7 @@ HTML;
     }
 
     $d = new \DateTime($from);
-    $d->modify('+ 2 months');
+    $d->modify($followupAlteration);
     // Avoid Xmas.
     $_ = $d->format('m-d');
     $y = $d->format('Y');
