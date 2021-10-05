@@ -197,6 +197,7 @@
 </article>
 
 <style lang=scss >
+  // The default state is hidden:
   article.inlay-signup-overlay {
     position: fixed;
     z-index: 1;
@@ -207,11 +208,14 @@
     max-height: 100vh;
     overflow-y: auto;
     background: white;
-    transform: translateY(10%);
+    transform: translateY(100%);
     opacity: 0;
     transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.2s linear;
     box-shadow: -10px -10px 30px 0 rgba(0,0,0,0.2);
     padding: 1rem;
+    &.hidden {
+      pointer-events: none;
+    }
   }
   article.inlay-signup-overlay.popup {
     transform: none;
