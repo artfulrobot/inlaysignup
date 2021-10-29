@@ -77,6 +77,15 @@ class InlaySignup extends InlayType {
       return ['token' => $this->getCSRFToken(['data' => $data, 'validFrom' => 5, 'validTo' => 120])];
     }
 
+    // The following code could be rewritten using the fluentimport extension, e.g.
+    // LocalFluentImport::of($data)
+    // ->setCleanValue('welcomeEmailID', $this->config['welcomeEmailID'])
+    // ->getOrCreateContact(['first_name', 'last_name', 'email'])
+    // ->addToGroup($this->config['mailingGroup'])
+    // ->addToGroup('consent_all_email')
+    // ->updateGDPR(['activity_source' => "Subscribed via InlaySignup '" . htmlspecialchars($this->instanceData['name']) . "'"])
+    // ->ifClean('welcomeEmailID')->sendWelcomeEmail($this->config['welcomeEmailID'])
+
     // Find Contact with XCM.
     $params = $data + ['contact_type' => 'Individual'];
     $contactID = civicrm_api3('Contact', 'getorcreate', $params)['id'] ?? NULL;
