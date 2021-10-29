@@ -90,7 +90,6 @@ class SignupA extends InlayType {
         INNER JOIN civicrm_contact c ON gc.contact_id = c.id AND c.is_deleted = 0
         WHERE gc.group_id = $groupID AND gc.status = 'Added'
         ");
-      Civi::log()->info("Count is $data[count] for group $groupID");
     }
     else {
       Civi::log()->notice("No mailing group configured for whole earth");
