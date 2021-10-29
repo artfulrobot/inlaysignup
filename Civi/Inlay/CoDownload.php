@@ -84,21 +84,8 @@ class CoDownload extends InlayType {
       return ['token' => $this->getCSRFToken(['data' => $data, 'validFrom' => 5, 'validTo' => 120])];
     }
 
-    // Find Contact with XCM.
-    $params = $data + ['contact_type' => 'Individual'];
-    $contactID = civicrm_api3('Contact', 'getorcreate', $params)['id'] ?? NULL;
-    if (!$contactID) {
-      Civi::log()->error('Failed to getorcreate contact with params: ' . json_encode($params));
-      throw new \Civi\Inlay\ApiException(500, ['error' => 'Server error: XCM1']);
-    }
-    // Update current_employer if organisation given.
-    if (($data['organisation'] ?? '')) {
-      $params = ['id' => $contactID, 'current_employer' => $data['organisation']];
-      civicrm_api3('Contact', 'create', $params);
-    }
 
-    //\CRM_Gdpr_SLA_Utils::recordSLAAcceptance($contactID);
-
+    // Generate the HTML for the download activity.
     $htmlSafe = [];
     foreach ($data as $k => $v) {
       $htmlSafe[$k] = $v;
@@ -115,14 +102,15 @@ class CoDownload extends InlayType {
       <p>They chose: <em>$htmlSafe[followup]</em></p>
 HTML;
 
-    $downloadActivityID = civicrm_api3('Activity', 'create', [
-      'source_contact_id' => $contactID,
-      'target_id'         => $contactID,
+    $i = \Civi\LocalFluentImport::ofClean($data);
+    $i->ifClean('organisation')->updateContact(['Individuals_details.Declared_Organisation' => $i->getCleanValue('organisation')]);
+    $i->addActivity([
       'activity_type_id'  => self::ACTIVITY_TYPE_ID_DOWNLOAD,
       'subject'           => $data['reportTitle'],
-      'status_id'         => 'Completed',
       'details'           => $details,
-    ])['id'];
+    ], 'downloadActivity');
+
+    //\CRM_Gdpr_SLA_Utils::recordSLAAcceptance($contactID);
 
     if ($this->config['followupText'] && $data['followup'] === 'Yes') {
 
@@ -135,14 +123,12 @@ HTML;
       }
 
       $date = $this->getSuitableFollowupDate(NULL, $followupAlteration);
-      $result = civicrm_api3('Activity', 'create', [
-        'parent_id'          => $downloadActivityID, /* This is a followup */
-        'source_contact_id'  => $contactID,
+      $i->addActivity([
+        'parent_id'          => $i->getContextValue(['downloadActivity', 'id']),
         'activity_date_time' => $date,
-        'target_id'          => $contactID,
         'activity_type_id'   => self::ACTIVITY_TYPE_ID_FOLLOWUP,
         'subject'            => "Follow up: " . $data['reportTitle'],
-        'status_id'          => 'Scheduled',
+        'status_id:name'     => 'Scheduled',
         'details'            => '<p>This scheduled activity means that on its date an automatic email will be sent to this contact to follow up on the report. Which followup gets sent depends on the configuration at the time.</p><p>You can cancel this follow up by deleting this activity.</p>',
       ]);
     }
