@@ -103,6 +103,7 @@ class CoDownload extends InlayType {
 HTML;
 
     $i = \Civi\LocalFluentImport::ofClean($data);
+    $i->getOrCreateContact(['first_name', 'last_name', 'email']);
     $i->ifClean('organisation')->updateContact(['Individuals_details.Declared_Organisation' => $i->getCleanValue('organisation')]);
     $i->addActivity([
       'activity_type_id'  => self::ACTIVITY_TYPE_ID_DOWNLOAD,
