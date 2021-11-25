@@ -20,6 +20,7 @@ class InlaySignup extends InlayType {
     'minScrollPercent' => 40,
     'notBefore'        => 10,
     'customCSS'        => '',
+    'notWhenUrlIs'     => '',
 
     'mailingGroup'     => NULL,
     'welcomeEmailID'   => NULL,
@@ -64,6 +65,7 @@ class InlaySignup extends InlayType {
       'notBefore'        => $this->config['notBefore'],
       'minScrollPercent' => $this->config['minScrollPercent'],
       'customCSS'        => $this->config['customCSS'],
+      'notWhenUrlIs'     => $this->config['notWhenUrlIs'],
     ];
   }
 

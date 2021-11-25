@@ -123,8 +123,18 @@
         </p>
       </div>
 
+      <div crm-ui-field="{name: 'inlayForm.notWhenUrlIs', title: ts('Disable pop-up when used on pages that match...')}">
+        <textarea
+          crm-ui-id="inlayForm.notWhenUrlIs"
+          name="notWhenUrlIs"
+          ng-model="inlay.config.notWhenUrlIs"
+          class="crm-form-text"
+          ></textarea>
+        <p>Put one pattern per line. If any match the URL that the inlay is placed on, it will not popup. Patterns are Javascript regular expressions, without the /delimeters/.</p>
+      </div>
     </div>
 
+    <br />
 
     <div crm-ui-accordion="{title: ts('Processing'), collapsed: false}">
 

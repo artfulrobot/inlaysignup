@@ -23,6 +23,27 @@ import App from './App.svelte';
      */
     window.inlaySignupInit = inlay => {
 
+      if (inlay.initData.notWhenUrlIs) {
+        let disabled = false,
+            url = window.location.href;
+        inlay.initData.notWhenUrlIs.split(/\r\n+/).map(pattern => {
+          let re = (new RegExp(pattern));
+          if (!re) {
+            console.log("Failed to make regexp from", pattern);
+            return;
+          }
+          disabled |= url.match(re) ? true : false;
+          if (disabled) {
+            console.log("inlaySignupInit disabled by rule:", pattern);
+          }
+        });
+
+        if (disabled) {
+            console.log("inlaySignupInit disabled ");
+          return;
+        }
+      }
+
       // Here we create a node after the <script/> tag to hold the form.
       const signupAppDiv = document.createElement('div');
       signupAppDiv.classList.add('inlaysignup-container');
