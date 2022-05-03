@@ -18,15 +18,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cross-env": "^7.0.2",
-    "laravel-mix": "^5.0.7",
-    "laravel-mix-bundle-analyzer": "^1.0.5",
-    "node-sass": "^4.14.1",
-    "sass-loader": "^10.0.4",
-    "vue-template-compiler": "^2.6.12"
+    "laravel-mix": "^6.0.43",
+    "sass": "^1.51.0",
+    "sass-loader": "^12.6.0",
+    "vue": "^2.6",
+    "vue-loader": "^15.9.7",
+    "vue-template-compiler": "^2.6.14"
   },
   "dependencies": {
-    "vue": "^2.6.12",
-    "vue-select": "^3.10.8"
+    "vue-select": "^3.10"
   }
 }

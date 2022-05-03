@@ -10,20 +10,24 @@ use CRM_Sos_JourneyLogic;
 
 class SignupA extends InlayType {
 
-  public static $typeName = 'Signup form A';
+  public static $typeName = 'SOS custom signup forms';
 
   public static $defaultConfig = [
-    'publicTitle'      => '',
-    'submitButtonText' => 'Send',
-    'smallprintHTML'   => NULL,
-    'webThanksHTML'    => NULL,
-    'phoneAsk'         => TRUE,
-    'mailingGroup'     => NULL,
-    'target'           => NULL,
-    'socials'          => ['twitter', 'facebook', 'email', 'whatsapp'],
-    'socialStyle'      => 'col-buttons', // col-buttons|col-icon|'',
-    'tweet'            => '',
-    'whatsappText'     => '',
+    'publicTitle'             => '',
+    'submitButtonText'        => 'Send',
+    'smallprintHTML'          => NULL,
+    'webThanksHTML'           => NULL,
+    'phoneAsk'                => TRUE,
+    'mailingGroup'            => NULL,
+    'target'                  => NULL,
+    'socials'                 => ['twitter', 'facebook', 'email', 'whatsapp'],
+    'socialStyle'             => 'col-buttons', // col-buttons|col-icon|'',
+    'tweet'                   => '',
+    'whatsappText'            => '',
+    'preFormHTML'             => '',
+    'postFormHTML'            => '',
+    'newsletterLabelText'     => '',
+    'thanksMessageTemplateID' => NULL,
     //'defaultMessage'   => NULL,
     //'instructionsHTML' => '',
     //'assignee'         => NULL,
@@ -63,6 +67,7 @@ class SignupA extends InlayType {
       'init'             => 'inlaySignupAInit',
     ];
     foreach (['socialStyle', 'submitButtonText', 'publicTitle', 'smallprintHTML', 'webThanksHTML', 'instructionsHTML', // 'phoneAsk'
+      'preFormHTML', 'postFormHTML', 'newsletterLabelText'
     ] as $_) {
       $data[$_] = $this->config[$_] ?? '';
     }
@@ -81,6 +86,7 @@ class SignupA extends InlayType {
 
     // Count people signed up...
     // @todo
+    /*
     if (!empty($this->config['mailingGroup'])) {
       // Count people in this group.
       $groupID = (int) $this->config['mailingGroup'];
@@ -93,8 +99,10 @@ class SignupA extends InlayType {
     }
     else {
       Civi::log()->notice("No mailing group configured for whole earth");
-      $data['count'] = 0;
     }
+     */
+    // Not used.
+    $data['count'] = 0;
 
     return $data;
   }
@@ -116,8 +124,8 @@ class SignupA extends InlayType {
     $data = $this->cleanupInput($request->getBody());
 
     if (empty($data['token'])) {
-      // Unsigned request. Issue a token that will be valid in 5s time and lasts 2mins max.
-      return ['token' => $this->getCSRFToken(['data' => $data, 'validFrom' => 5, 'validTo' => 120])];
+      // Unsigned request. Issue a token that will be valid in 2s time and lasts 2mins max.
+      return ['token' => $this->getCSRFToken(['data' => $data, 'validFrom' => 2, 'validTo' => 120])];
     }
 
     /*
@@ -131,57 +139,22 @@ class SignupA extends InlayType {
      */
 
     // Process their journey. THIS IS COMPLETELY CUSTOM
+
+    $customCode = [
+              '5612e1ca4e8a' => 'whole_earth_signup',
+              //'6c471fba10bf' => 'bath_bomb_soundscape_form',
+      ][$this->getPublicID()] ?? 'custom_signup_inlay';
+
     $journeyParams = $data + [
-      'journey_action' => 'whole_earth_signup',
+      'journey_action' => $customCode, // ugly hack
+      'inlay_name'     => $this->getName(),
       'group_id'       => (int) $this->config['mailingGroup'],
+      'msg_tpl_id'     => (int) $this->config['thanksMessageTemplateID'],
     ];
+    Civi::log()->info('SOS SignupA journey params ' . json_Encode($journeyParams));
     CRM_Sos_JourneyLogic::processApiRequest($journeyParams);
 
-
     return ['success' =>1];
-    return ['error' => 'unfinished'];
-    // Require 'contactform1' form processor.
-    try {
-      $formProcessor = civicrm_api3('FormProcessorInstance', 'getsingle', [
-        'name' => 'contactform1',
-      ]);
-    }
-    catch (\Exception $e) {
-      Civi::log()->error('Failed to find "contactform1" FormProcessorInstance', ['exception' => $e]);
-      throw new \Civi\Inlay\ApiException(500, ['error' => 'Server error: ICF1']);
-    }
-
-    // Verbose list of data for clarity.
-    $fpData = [
-      'email'      => $data['email'],
-      'first_name' => $data['first_name'],
-      'last_name'  => $data['last_name'],
-    ];
-    /*
-    if ($this->config['phoneAsk'] && !empty($data['phone'])) {
-      $fpData['phone'] = $data['phone'];
-    }
-     */
-
-    // Create the activity details.
-    $fpData['activity_subject'] = $this->getName() . " (website contact form)";
-    $fpData['activity_details'] = "<p>We received the following message:</p>\n<blockquote><p>"
-      . preg_replace('/[\r\n]+/', '</p><p>', htmlspecialchars($data['message']))
-      . '</p></blockquote><p>Details provided:</p><ul>';
-    foreach (['email', 'first_name', 'last_name', 'phone'] as $_) {
-      if ($_) {
-        $fpData['activity_details'] .= '<li>' . ucfirst(str_replace('_', ' ', $_)) . ': ' . htmlspecialchars($data[$_]) . '</li>';
-      }
-    }
-    $fpData['activity_details'] .= '</ul>';
-    $fpData['activity_details'] .= '<pre>'  . htmlspecialchars(json_encode($data, JSON_PRETTY_PRINT)) . '</pre>';
-
-    // Use the Form Processor to process it.
-    $result = civicrm_api3('FormProcessor', 'contactform1', $fpData);
-
-    // @todo email activity
-
-    return [ 'success' => 1 ];
   }
 
   /**
@@ -191,6 +164,7 @@ class SignupA extends InlayType {
    * - first_name
    * - last_name
    * - email
+   * - newsletterCheckbox
    * - token TRUE|unset
    *
    * @param array $data
@@ -220,6 +194,18 @@ class SignupA extends InlayType {
     }
     if ($errors) {
       throw new \Civi\Inlay\ApiException(400, ['error' => implode(', ', $errors)]);
+    }
+
+    // Handle checkbox.
+    Civi::log()->info('SOS SignupA ' . json_Encode(['configVal' => $this->config['newsletterLabelText'], 'data' => $data]));
+    if ($this->config['newsletterLabelText']) {
+      $valid['newsletterCheckbox'] = (bool) (($data['newsletterCheckbox'] ?? FALSE));
+      Civi::log()->info('SOS SignupA here');
+    }
+    else {
+      // If we did not offer a checkbox, the whole form is an opt-in.
+      $valid['newsletterCheckbox'] = TRUE;
+      Civi::log()->info('SOS SignupA there');
     }
 
     // Data is valid.

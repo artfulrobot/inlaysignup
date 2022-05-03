@@ -3,7 +3,9 @@
 
     <h2 v-if="inlay.initData.publicTitle">{{inlay.initData.publicTitle}}</h2>
 
+
     <ometer-sos-tree
+      v-if="sosCustom === 'whole_earth'"
       :count="countSigners"
       :target="target"
       stmt="You’re helping us plant trees in Sumatra"
@@ -11,9 +13,11 @@
 
     <form action='#' @submit.prevent="submitForm" v-if="stage === 'form'">
 
+      <div class="isa-input-wrapper isa-pre-form" v-if="inlay.initData.preFormHTML" v-html="inlay.initData.preFormHTML" />
+
       <div class="isa-2-cols">
         <div class="isa-input-wrapper">
-          <label :for="myId + 'fname'" >First name</label>
+          <label :for="myId + 'fname'" class="text-or-email">First name</label>
           <input
             required
             type="text"
@@ -25,7 +29,7 @@
             />
         </div>
         <div class="isa-input-wrapper">
-          <label :for="myId + 'lname'" >Last name</label>
+          <label :for="myId + 'lname'" class="text-or-email">Last name</label>
           <input
             required
             type="text"
@@ -39,7 +43,7 @@
       </div>
 
       <div class="isa-input-wrapper">
-        <label :for="myId + 'email'" >Email</label>
+        <label :for="myId + 'email'" class="text-or-email">Email</label>
         <input
           required
           type="email"
@@ -64,6 +68,14 @@
           />
       </div>
       -->
+      <div class="isa-post-form isa-input-wrapper" v-if="inlay.initData.postFormHTML" v-html="inlay.initData.postFormHTML" />
+
+      <div class="isa-input-wrapper isa-newsletter" v-if="inlay.initData.newsletterLabelText" >
+        <input type=checkbox class="checkbox check--hidden" v-model="newsletterCheckbox" :id="myId + 'newsletterCheckbox'" />
+        <label :for="myId + 'newsletterCheckbox'" class="checkbox"><span class="check"></span></label>
+        <label class="" :for="myId + 'newsletterCheckbox'" >&nbsp; {{inlay.initData.newsletterLabelText}}</label>
+        <div class="clear"/>
+      </div>
 
       <div class="isa-smallprint"
         v-if="inlay.initData.smallprintHTML"
@@ -109,7 +121,7 @@
   }
   input[type="text"],
   input[type="email"],
-  label {
+  label.text-or-email {
     border: solid 2px white;
     box-shadow: 0 4px 0 rgba(0,0,0,.2);
     padding: 0.75rem 1rem;
@@ -118,7 +130,7 @@
     font-size: 1.1rem;
   }
 
-  label {
+  label.text-or-email {
     display: block;
     flex: 0 0 8rem;
     background: white;
@@ -132,7 +144,13 @@
     background: transparent;
   }
 
-  .isa-smallprint {
+  .isa-post-form, .isa-pre-form {
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .isa-smallprint, isa-smallprint p {
     font-size: 0.825rem;
   }
 
@@ -157,7 +175,7 @@ import OmeterSosTree from './OmeterSosTree.vue';
 // import vSelect from 'vue-select';
 
 export default {
-  props: ['inlay'],
+  props: ['inlay', 'sosCustom'],
   components: {InlayProgress, InlaySocials, OmeterSosTree},
   data() {
     window.xx = this;
@@ -168,7 +186,8 @@ export default {
       first_name: '',
       last_name: '',
       email: '',
-      phone: ''
+      phone: '',
+      newsletterCheckbox: false
     };
     return d;
   },
@@ -193,7 +212,8 @@ export default {
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
-        phone: this.phone
+        phone: this.phone, // blank, not used
+        newsletterCheckbox: this.newsletterCheckbox,
       };
 
       const progress = this.$refs.progress;
@@ -207,7 +227,7 @@ export default {
             progress.startTimer(5, 80, {easing: false});
             // Force 5s wait for the token to become valid
             return new Promise((resolve, reject) => {
-              window.setTimeout(resolve, 5000);
+              window.setTimeout(resolve, 2000);
             });
           }
           else {

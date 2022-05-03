@@ -23,6 +23,36 @@
         />
     </div>
 
+    <div crm-ui-field="{name: 'inlayForm.preFormHTML', title: ts('Optional text under title, before form')}">
+      <textarea
+        crm-ui-id="inlayForm.preFormHTML"
+        crm-ui-richtext
+        name="preFormHTML"
+        ng-model="inlay.config.preFormHTML"
+        class="crm-form-text"
+        ></textarea>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.postFormHTML', title: ts('Optional text after form before newsletter checkbox')}">
+      <textarea
+        crm-ui-id="inlayForm.postFormHTML"
+        crm-ui-richtext
+        name="postFormHTML"
+        ng-model="inlay.config.postFormHTML"
+        class="crm-form-text"
+        ></textarea>
+    </div>
+
+    <div crm-ui-field="{name: 'inlayForm.newsletterLabelText', title: ts('Label text for newsletter checkbox.')}">
+      <textarea
+        crm-ui-id="inlayForm.newsletterLabelText"
+        name="newsletterLabelText"
+        ng-model="inlay.config.newsletterLabelText"
+        class="crm-form-text"
+        ></textarea>
+      <p>If you leave this blank then no checkbox will be shown; all people who submit the form will be signed up - useful when the entire purpose of the form is for people to sign-up.</p>
+    </div>
+
     <!--
     <div crm-ui-field="{name: 'inlayForm.instructionsHTML', title: ts('InstructionsHTML for user about the message field')}">
       <textarea
@@ -154,6 +184,17 @@
     </div>
 
 
+    <h3>Thank you/confirmation email</h3>
+    <div crm-ui-field="{name: 'inlayForm.thanksMessageTemplateID', title: ts('Thank you email to send (sent to everyone who submits the form, immediately)')}">
+      <select
+        crm-ui-select="{allowClear:true, dropdownAutoWidth: true, select2:{}}"
+        style="width: 100%"
+        ng-model="inlay.config.thanksMessageTemplateID"
+        ng-options="i.msg_title + ' | ' + i.msg_subject for i in messageTpls track by i.id"
+        >
+        <option value="">(Do not send an email)</option>
+      </select>
+    </div>
 
 
     <!--
