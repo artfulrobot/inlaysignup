@@ -125,7 +125,7 @@ class InlaySignup extends InlayType {
     }
 
     // Send welcome mailing, unless already handled by hook.
-    if (empty($handledByHook['addToGroup'])) {
+    if (empty($handledByHook['welcomeMailing'])) {
       $this->sendWelcomeEmail($contactID, $data);
     }
 
@@ -159,7 +159,7 @@ class InlaySignup extends InlayType {
     }
 
     // Loosely validate source against angle brackets.
-    $valid['source'] = trim($data['source'] ?? '');
+    $valid['source'] = mb_substr(trim($data['source'] ?? ''), 0, 255);
     if ($valid['source'] && !preg_match('@^[^<>]+$@', $valid['source'])) {
       $valid['source'] = '';
       $errors[] = "Invalid request (this should not happen) SRC1";
