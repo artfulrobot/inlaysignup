@@ -1,6 +1,4 @@
 <script>
-  const cookieExpiryDays = 90;
-
   import { onMount } from 'svelte';
   import Input from './Input.svelte';
   import Progress from './Progress.svelte';
@@ -75,10 +73,10 @@
   function dismissed(e) {
     dismissedThisSession = true;
     state = 'hidden';
-    console.log("Signup pop-up dismissed. We have set a cookie 'declinedSignup' which means we won't bother you with it again for " + cookieExpiryDays + " days.");
+    console.log("Signup pop-up dismissed. We have set a cookie 'declinedSignup' which means we won't bother you with it again for " + inlay.initData.cookieExpiryDays + " days.");
     document.removeEventListener('mouseout', mouseOut);
     // Now we have shown the popup, don't show it again for cookieExpiryDays days.
-    CookieService.setCookie('declinedSignup', true, cookieExpiryDays);
+    CookieService.setCookie('declinedSignup', true, inlay.initData.cookieExpiryDays);
   }
 
   /**
@@ -121,8 +119,8 @@
           busy = false;
 
           // Now we have shown the popup, don't show it again for cookieExpiryDays days.
-          console.log("We have set a cookie 'declinedSignup' which means we won't bother you with the pop-up again. The cookie expires in " + cookieExpiryDays + " days.");
-          CookieService.setCookie('declinedSignup', true, cookieExpiryDays);
+          console.log("We have set a cookie 'declinedSignup' which means we won't bother you with the pop-up again. The cookie expires in " + inlay.initData.cookieExpiryDays + " days.");
+          CookieService.setCookie('declinedSignup', true, inlay.initData.cookieExpiryDays);
         }
         else {
           alert("Sorry, there was a problem with the form: " + (r.error || 'unknown error'));

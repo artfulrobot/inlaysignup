@@ -19,6 +19,7 @@ class InlaySignup extends InlayType {
     'webThanksHTML'    => NULL,
     'minScrollPercent' => 40,
     'notBefore'        => 10,
+    'cookieExpiryDays' => 90,
     'customCSS'        => '',
     'notWhenUrlIs'     => '',
 
@@ -66,6 +67,7 @@ class InlaySignup extends InlayType {
       'minScrollPercent' => $this->config['minScrollPercent'],
       'customCSS'        => $this->config['customCSS'],
       'notWhenUrlIs'     => $this->config['notWhenUrlIs'],
+      'cookieExpiryDays' => $this->config['cookieExpiryDays'],
     ];
   }
 

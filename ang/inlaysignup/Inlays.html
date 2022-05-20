@@ -72,6 +72,7 @@
     </div>
 
     <div crm-ui-accordion="{title: ts('UX Tweaks'), collapsed: true}">
+
       <div crm-ui-field="{name: 'inlayForm.notBefore', title: ts('Wait how many seconds before allowing a pop-up')}">
         <input
           crm-ui-id="inlayForm.notBefore"
@@ -99,12 +100,26 @@
           <em>then</em> the user begins scrolling up.</p>
       </div>
 
+      <div crm-ui-field="{name: 'inlayForm.cookieExpiryDays', title: ts('How many days before nagging again?')}">
+        <input
+          crm-ui-id="inlayForm.cookieExpiryDays"
+          name="cookieExpiryDays"
+          ng-model="inlay.config.cookieExpiryDays"
+          class="crm-form-text"
+          type="number"
+          min=1
+          />
+        <p>A cookie (`declinedSignup`) is set to remember that people have dismissed the sign-up pop-up. When this expires they will be asked again.</p>
+      </div>
+
       <div crm-ui-field="{name: 'inlayForm.css', title: ts('Insert custom CSS (danger!)')}">
         <textarea
           crm-ui-id="inlayForm.customCSS"
           name="customCSS"
           ng-model="inlay.config.customCSS"
           class="crm-form-text"
+          rows="10"
+          cols="60"
           ></textarea>
         <p class="description">Hints:
           <pre>
