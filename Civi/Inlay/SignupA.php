@@ -28,6 +28,7 @@ class SignupA extends InlayType {
     'postFormHTML'            => '',
     'newsletterLabelText'     => '',
     'thanksMessageTemplateID' => NULL,
+    'defaultJourneyStep'      => 'S1', // Chassé
     //'defaultMessage'   => NULL,
     //'instructionsHTML' => '',
     //'assignee'         => NULL,
@@ -146,10 +147,11 @@ class SignupA extends InlayType {
       ][$this->getPublicID()] ?? 'custom_signup_inlay';
 
     $journeyParams = $data + [
-      'journey_action' => $customCode, // ugly hack
-      'inlay_name'     => $this->getName(),
-      'group_id'       => (int) $this->config['mailingGroup'],
-      'msg_tpl_id'     => (int) $this->config['thanksMessageTemplateID'],
+      'journey_action'     => $customCode, // ugly hack
+      'inlay_name'         => $this->getName(),
+      'group_id'           => (int) $this->config['mailingGroup'],
+      'msg_tpl_id'         => (int) $this->config['thanksMessageTemplateID'],
+      'defaultJourneyStep' => $this->config['defaultJourneyStep'] ?? '',
     ];
     Civi::log()->info('SOS SignupA journey params ' . json_Encode($journeyParams));
     CRM_Sos_JourneyLogic::processApiRequest($journeyParams);
