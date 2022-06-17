@@ -29,5 +29,9 @@
   </classloader>
   <civix>
     <namespace>CRM/Inlaysignup</namespace>
+    <format>22.05.2</format>
   </civix>
+  <mixins>
+    <mixin>ang-php@1.0.0</mixin>
+  </mixins>
 </extension>
