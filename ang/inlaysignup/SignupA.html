@@ -125,6 +125,19 @@
       </select>
     </div>
 
+
+    <div crm-ui-field="{name: 'inlayForm.defaultJourneyStep', title: ts('Default journey step')}">
+      <input
+        crm-ui-id="inlayForm.defaultJourneyStep"
+        name="defaultJourneyStep"
+        ng-model="inlay.config.defaultJourneyStep"
+        class="crm-form-text"
+        placeholder="{{ts('e.g. S1')}}"
+        />
+      <p>Leaving this blank will mean sign-ups are not added to any journey.</p>
+    </div>
+
+
     <h3>Social Media</h3>
 
     <div crm-ui-field="{name: 'inlayForm.socialStyle', title: ts('Social media button colours')}">
