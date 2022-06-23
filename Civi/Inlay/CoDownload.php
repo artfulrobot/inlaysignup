@@ -115,12 +115,16 @@ HTML;
 
     if ($this->config['followupText'] && $data['followup'] === 'Yes') {
 
+      $status = 'Scheduled';
       $followupAlteration = '+2 months';
       if ($data['reportTitle'] === 'Britain Talks COP26') {
         $followupAlteration = '+5 weeks';
       }
       elseif ($data['reportTitle'] === 'Engaging different audiences around COP26: a guide for UK-based climate advocates') {
         $followupAlteration = '+5 weeks';
+      }
+      elseif ($data['reportTitle'] === 'Climate Outreach - Natural England - Nature visuals') {
+        $status = 'Cancelled';
       }
 
       $date = $this->getSuitableFollowupDate(NULL, $followupAlteration);
@@ -129,7 +133,7 @@ HTML;
         'activity_date_time' => $date,
         'activity_type_id'   => self::ACTIVITY_TYPE_ID_FOLLOWUP,
         'subject'            => "Follow up: " . $data['reportTitle'],
-        'status_id:name'     => 'Scheduled',
+        'status_id:name'     => $status,
         'details'            => '<p>This scheduled activity means that on its date an automatic email will be sent to this contact to follow up on the report. Which followup gets sent depends on the configuration at the time.</p><p>You can cancel this follow up by deleting this activity.</p>',
       ]);
     }
