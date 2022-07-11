@@ -46,7 +46,7 @@ class InlaySignup extends InlayType {
    *
    * @return array
    */
-  public function getInitData() {
+  public function getInitData() :array {
     return [
       // Name of global Javascript function used to boot this app.
       'init'             => 'inlaySignupInit',
@@ -68,7 +68,7 @@ class InlaySignup extends InlayType {
    *
    * @throws \Civi\Inlay\ApiException;
    */
-  public function processRequest(ApiRequest $request) {
+  public function processRequest(ApiRequest $request) :array {
 
     $data = $this->cleanupInput($request->getBody());
 
@@ -253,7 +253,7 @@ class InlaySignup extends InlayType {
    *
    * @return string Content of a Javascript file.
    */
-  public function getExternalScript() {
+  public function getExternalScript() :string {
     return file_get_contents(E::path('dist/inlay-signup.js'));
   }
 
