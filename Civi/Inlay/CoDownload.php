@@ -51,7 +51,7 @@ class CoDownload extends InlayType {
    *
    * @return array
    */
-  public function getInitData() {
+  public function getInitData() :array {
     return [
       // Name of global Javascript function used to boot this app.
       'init'           => 'inlayCoDownloadInit',
@@ -75,7 +75,7 @@ class CoDownload extends InlayType {
    *
    * @throws \Civi\Inlay\ApiException;
    */
-  public function processRequest(ApiRequest $request) {
+  public function processRequest(ApiRequest $request) :array {
 
     $data = $this->cleanupInput($request->getBody());
 
@@ -145,6 +145,15 @@ HTML;
    * Validate and clean up input data.
    *
    * @param array $data
+   * - first_name
+   * - last_name
+   * - email
+   * - questionResponse
+   * - followup
+   * - location
+   * - reportTitle
+   * - organisation (optional)
+   * - token (sent on 2nd request, for validation)
    *
    * @return array of acceptable data
    */
@@ -156,10 +165,12 @@ HTML;
     foreach (['first_name', 'last_name', 'email', 'questionResponse', 'followup', 'location', 'reportTitle'] as $field) {
       $val = trim($data[$field] ?? '');
       if (empty($val)) {
+        // xxx ts todo
         $errors[] = str_replace('_', ' ', $field) . " required.";
       }
       else {
         if ($field === 'email' && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
+          // xxx ts
           $errors[] = "invalid email address";
         }
         else {
@@ -201,15 +212,6 @@ HTML;
   }
 
   /**
-   * Returns a URL to a page that lets an admin user configure this Inlay.
-   *
-   * @return string URL
-   */
-  public function getAdminURL() {
-
-  }
-
-  /**
    * Get the Javascript app script.
    *
    * This will be bundled with getInitData() and some other helpers into a file
@@ -217,7 +219,7 @@ HTML;
    *
    * @return string Content of a Javascript file.
    */
-  public function getExternalScript() {
+  public function getExternalScript() :string {
     return file_get_contents(E::path('dist/inlay-coDownload.js'));
   }
 
