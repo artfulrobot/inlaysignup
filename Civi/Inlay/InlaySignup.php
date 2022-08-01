@@ -35,26 +35,11 @@ class InlaySignup extends InlayType {
   public static $editURLTemplate = 'civicrm/a?#/inlays/signup/{id}';
 
   /**
-   * Sets the config ensuring it's valid.
-   *
-   * This implementation simply ensures all the defaults exist, and that no
-   * other keys exist, but you could do other things, especially if you need to
-   * coerce some old config into a new style.
-   *
-   * @param array $config
-   *
-   * @return \Civi\Inlay\Type (this)
-   */
-  public function setConfig(array $config) {
-    $this->config = array_intersect_key($config + static::$defaultConfig, static::$defaultConfig);
-  }
-
-  /**
    * Generates data to be served with the Javascript application code bundle.
    *
    * @return array
    */
-  public function getInitData() {
+  public function getInitData() :array {
     return [
       // Name of global Javascript function used to boot this app.
       'init'             => 'inlaySignupInit',
@@ -83,7 +68,7 @@ class InlaySignup extends InlayType {
    *
    * @throws \Civi\Inlay\ApiException;
    */
-  public function processRequest(ApiRequest $request) {
+  public function processRequest(ApiRequest $request) :array {
 
     $data = $this->cleanupInput($request->getBody());
 
@@ -182,7 +167,6 @@ class InlaySignup extends InlayType {
         // Token failed. Issue a public friendly message, though this should
         // never be seen by anyone legit.
         Civi::log()->notice("Token error: " . $e->getMessage . "\n" . $e->getTraceAsString());
-        watchdog('inlay', $e->getMessage() . "\n" . $e->getTraceAsString, array(), WATCHDOG_ERROR);
         throw new \Civi\Inlay\ApiException(400,
           ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]);
       }
@@ -236,7 +220,7 @@ class InlaySignup extends InlayType {
       }
 
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       $error = __CLASS__ . "::" . __FUNCTION__ . ":ERROR: failed to send mailing. Error:"  . $e->getMessage();
       if (isset($msgTplSendParams)) {
         $error .= " MessageTemplate.send params were: " . json_encode($msgTplSendParams);
@@ -274,7 +258,7 @@ class InlaySignup extends InlayType {
    *
    * @return string Content of a Javascript file.
    */
-  public function getExternalScript() {
+  public function getExternalScript() :string {
     return file_get_contents(E::path('dist/inlaysignup.js'));
   }
 
