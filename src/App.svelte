@@ -28,7 +28,7 @@
         lastScrollY = windowScrollY;
       }
       else {
-        if (windowScrollY < lastScrollY - 20) {
+        if (windowScrollY < lastScrollY - 20 && state !== 'thanks') {
           state = 'popup';
         }
       }
@@ -41,7 +41,7 @@
       // Don't do anything until they've been on the page 10s.
       return;
     }
-    if (!e.toElement && !e.relatedTarget && e.clientY < 10) {
+    if (!e.toElement && !e.relatedTarget && e.clientY < 10 && state !== 'thanks') {
       // The mouse has exited the document, at the top.
       state = 'popup';
     }
