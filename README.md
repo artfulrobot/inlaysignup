@@ -1,44 +1,21 @@
-# inlaysignup
+# Inlay Signup
 
-![Screenshot](/images/screenshot.png)
-
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+Makes a pop-up signup form appear after a bit of time on the page followed by an indication of wanting to leave the page.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
-* PHP v7.0+
-* CiviCRM (*FIXME: Version number*)
+* PHP v7.4+
+* CiviCRM 5.49+
 
-## Installation (Web UI)
+## Brief how-to
 
-This extension has not yet been published for installation via the web UI.
+It's an [Inlay](https://lab.civicrm.org/extensions/inlay) so once installed go
+to Administer » Inlays and create a new pop-up signup form.
 
-## Installation (CLI, Zip)
+## Hooks
 
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-cd <extension-dir>
-cv dl inlaysignup@https://github.com/FIXME/inlaysignup/archive/master.zip
-```
-
-## Installation (CLI, Git)
-
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-git clone https://github.com/FIXME/inlaysignup.git
-cv en inlaysignup
-```
-
-## Usage
-
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
-
-## Known Issues
-
-(* FIXME *)
+You can completely override the processing of the first, last, email data sent
+by implementing a listener on `Civi\Inlay\InlaySignup::PROCESS_EVENT` and
+modifying the `$event->chain` which contains callbacks.

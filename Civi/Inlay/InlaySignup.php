@@ -9,6 +9,8 @@ use CRM_Inlaysignup_ExtensionUtil as E;
 
 class InlaySignup extends InlayType {
 
+  public const PROCESS_EVENT = 'civi.inlaysignup.process';
+
   public static $typeName = 'Pop-up Signup form';
 
   public static $defaultConfig = [
@@ -40,7 +42,7 @@ class InlaySignup extends InlayType {
    *
    * @return array
    */
-  public function getInitData() :array {
+  public function getInitData(): array {
     return [
       // Name of global Javascript function used to boot this app.
       'init'             => 'inlaySignupInit',
@@ -70,7 +72,7 @@ class InlaySignup extends InlayType {
    *
    * @throws \Civi\Inlay\ApiException;
    */
-  public function processRequest(ApiRequest $request) :array {
+  public function processRequest(ApiRequest $request): array {
 
     $data = $this->cleanupInput($request->getBody());
 
@@ -79,46 +81,30 @@ class InlaySignup extends InlayType {
       return ['token' => $this->getCSRFToken(['data' => $data, 'validFrom' => 5, 'validTo' => 120])];
     }
 
-    // Find Contact with XCM.
-    $params = $data + ['contact_type' => 'Individual'];
-    $contactID = civicrm_api3('Contact', 'getorcreate', $params)['id'] ?? NULL;
-    if (!$contactID) {
-      Civi::log()->error('Failed to getorcreate contact with params: ' . json_encode($params));
-      throw new \Civi\Inlay\ApiException(500, ['error' => 'Server error: XCM1']);
+    // Allow modification of the processing chain.
+    // Each callback in the chain is called with callback(array $data, \Civi\Inlay\Type $inlay)
+    $event = \Civi\Core\Event\GenericHookEvent::create([
+      'chain' => [
+        // The following must set contactID on the data array
+        'findOrCreate'        => [$this, 'findOrCreateWithXCM'],
+
+        'setBulkOnGivenEmail' => [$this, 'setBulkOnGivenEmail'],
+        'addContactToGroup'   => [$this, 'addContactToGroup'],
+        'sendWelcomeEmail'    => [$this, 'sendWelcomeEmail'],
+      ],
+    ]);
+    // Allow extensions to alter the processing chain.
+    // They may completely change $event->chain, e.g.
+    // $event->chain = [function($data, $inlay) { ... }]
+    // Or may choose to override/remove/add bits as they wish.
+    \Civi::dispatcher()->dispatch(static::PROCESS_EVENT, $event);
+
+    // Process the chain.
+    foreach ($event->chain as $callback) {
+      $callback($data, $this);
     }
 
-    // Ensure this email is their Bulk Mail one.
-    $result = \Civi\Api4\Email::update(FALSE)
-      ->addWhere('email', '=', $data['email'])
-      ->addWhere('contact_id', '=', $contactID)
-      ->addValue('is_bulkmail', TRUE)
-      ->setLimit(1)
-      ->execute();
-
-
-    // Call out to a hook to let local changes happen.
-    // Create an event object with all the data you want to pass in.
-    // Hook implementations can set handledByHook entries to TRUE if they take
-    // responsiblity for implementing that.
-    $handledByHook = [
-      'addToGroup' => FALSE,
-      'welcomeMailing' => FALSE,
-    ];
-    $event = Civi\Core\Event\GenericHookEvent::create(['input' => $data, 'inlay' => $this, 'contactID' => $contactID, 'handledByHook' => &$handledByHook]);
-    \Civi::dispatcher()->dispatch('civi.inlaysignup.submission', $event);
-
-    // Add to group. If we have one configured, and if this wasn't handled by the hook.
-    $groupID = $this->config['mailingGroup'];
-    if (empty($handledByHook['addToGroup']) && $groupID) {
-      list($total, $added, $notAdded) = \CRM_Contact_BAO_GroupContact::addContactsToGroup([$contactID], $groupID, 'Web', 'Added');
-    }
-
-    // Send welcome mailing, unless already handled by hook.
-    if (empty($handledByHook['welcomeMailing'])) {
-      $this->sendWelcomeEmail($contactID, $data);
-    }
-
-    return [ 'success' => 1 ];
+    return ['success' => 1];
   }
 
   /**
@@ -136,12 +122,10 @@ class InlaySignup extends InlayType {
       $val = trim($data[$field] ?? '');
       if (empty($val)) {
         $errors[] = str_replace('_', ' ', $field) . " required.";
-      }
-      else {
+      } else {
         if ($field === 'email' && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
           $errors[] = "invalid email address";
-        }
-        else {
+        } else {
           $valid[$field] = $val;
         }
       }
@@ -164,21 +148,54 @@ class InlaySignup extends InlayType {
       try {
         $this->checkCSRFToken($data['token'], $valid);
         $valid['token'] = TRUE;
-      }
-      catch (\InvalidArgumentException $e) {
+      } catch (\InvalidArgumentException $e) {
         // Token failed. Issue a public friendly message, though this should
         // never be seen by anyone legit.
         Civi::log()->notice("Token error: " . $e->getMessage . "\n" . $e->getTraceAsString());
-        throw new \Civi\Inlay\ApiException(400,
-          ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]);
+        throw new \Civi\Inlay\ApiException(
+          400,
+          ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]
+        );
       }
     }
-
 
     return $valid;
   }
 
-  public function sendWelcomeEmail($contactID, $valid) {
+  /**
+   * Default find-or-create functionality.
+   */
+  public function findOrCreateWithXCM(array &$data) {
+    $params = $data + ['contact_type' => 'Individual'];
+    $contactID = civicrm_api3('Contact', 'getorcreate', $params)['id'] ?? NULL;
+    if (!$contactID) {
+      Civi::log()->error('Failed to getorcreate contact with params: ' . json_encode($params));
+      throw new \Civi\Inlay\ApiException(500, ['error' => 'Server error: XCM1']);
+    }
+    $data['contactID'] = $contactID;
+  }
+
+  /**
+   */
+  public function setBulkOnGivenEmail($data) {
+    \Civi\Api4\Email::update(FALSE)
+      ->addWhere('email', '=', $data['email'])
+      ->addWhere('contact_id', '=', $data['contactID'])
+      ->addValue('is_bulkmail', TRUE)
+      ->setLimit(1)
+      ->execute();
+  }
+
+  public function addContactToGroup($data) {
+    $groupID = $this->config['mailingGroup'];
+    if ($groupID) {
+      $contactIDs = [$data['contactID']];
+      // list($total, $added, $notAdded) = \CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID, 'Web', 'Added');
+      \CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID, 'Web', 'Added');
+    }
+  }
+
+  public function sendWelcomeEmail(array $data) {
     if (!$this->config['welcomeEmailID']) {
       // Not configured to send an email.
       return;
@@ -202,8 +219,8 @@ class InlaySignup extends InlayType {
       $msgTplSendParams = [
         'id'         => $template['id'],
         'from'       => $from,
-        'to_email'   => $valid['email'],
-        'contact_id' => $contactID,
+        'to_email'   => $data['email'],
+        'contact_id' => $data['contactID'],
         'disable_smarty' => 1,
         //'bcc'        => "you@example.org", // so I can keep an eye.
         //'template_params' => []
@@ -214,15 +231,12 @@ class InlaySignup extends InlayType {
         Civi::log()->warning("Mail disabled. Otherwise would send mailing $template[id]");
         $details = "Message NOT sent: mailer backend is disabled - eg. development mode";
         $status = 'Cancelled';
-      }
-      else {
-        $result = civicrm_api3('MessageTemplate', 'send', $msgTplSendParams);
+      } else {
+        civicrm_api3('MessageTemplate', 'send', $msgTplSendParams);
         $details = "<p>Message successfully sent</p>";
         $status = 'Completed';
       }
-
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       $error = __CLASS__ . "::" . __FUNCTION__ . ":ERROR: failed to send mailing. Error:"  . $e->getMessage();
       if (isset($msgTplSendParams)) {
         $error .= " MessageTemplate.send params were: " . json_encode($msgTplSendParams);
@@ -234,22 +248,22 @@ class InlaySignup extends InlayType {
     }
 
     // Record that the email was(/not) sent.
-    $result = civicrm_api3('Activity', 'create', [
+    civicrm_api3('Activity', 'create', [
       'source_contact_id' => \CRM_Core_BAO_Domain::getDomain()->contact_id,
-      'target_id'         => $contactID,
+      'target_id'         => $data['contactID'],
       'activity_type_id'  => "Email",
       'subject'           => "Sent Email '" . $template['msg_title'] . "'",
       'status_id'         => $status,
       'details'           => $details,
     ]);
   }
+
   /**
    * Returns a URL to a page that lets an admin user configure this Inlay.
    *
    * @return string URL
    */
   public function getAdminURL() {
-
   }
 
   /**
@@ -260,8 +274,7 @@ class InlaySignup extends InlayType {
    *
    * @return string Content of a Javascript file.
    */
-  public function getExternalScript() :string {
+  public function getExternalScript(): string {
     return file_get_contents(E::path('dist/inlay-signup-popup.js'));
   }
-
 }
