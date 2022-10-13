@@ -40,4 +40,6 @@ mix
       },
     }),
   })
+  .js('src/sos/inlay-signup-sos.js', 'dist')
+  .vue({version: 2})
 ;
