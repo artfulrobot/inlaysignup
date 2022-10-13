@@ -5,7 +5,7 @@ require('laravel-mix-svelte');
 
 mix
   .setPublicPath('dist')
-  .js('src/inlaysignup.js', 'dist')
+  .js('src/popup/inlay-signup-popup.js', 'dist')
   .svelte({
     // If dev === true, causes extra code to be added to components that will perform
     // runtime checks and provide debugging information during development.

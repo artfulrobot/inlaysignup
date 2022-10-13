@@ -9,7 +9,7 @@ use CRM_Inlaysignup_ExtensionUtil as E;
 
 class InlaySignup extends InlayType {
 
-  public static $typeName = 'Simple Signup form';
+  public static $typeName = 'Pop-up Signup form';
 
   public static $defaultConfig = [
     'title'            => 'Sign up',
@@ -259,7 +259,7 @@ class InlaySignup extends InlayType {
    * @return string Content of a Javascript file.
    */
   public function getExternalScript() :string {
-    return file_get_contents(E::path('dist/inlaysignup.js'));
+    return file_get_contents(E::path('dist/inlay-signup-popup.js'));
   }
 
 }
