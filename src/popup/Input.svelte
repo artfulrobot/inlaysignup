@@ -11,6 +11,9 @@ export let type = 'text';
 export let name = '';
 export let initialCaps = false;
 
+export function focus() {
+  input && input.focus();
+}
 let pristine = true;
 let input;
 let validationMessage;

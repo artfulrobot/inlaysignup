@@ -74,6 +74,17 @@
 
     <div crm-ui-accordion="{title: ts('UX Tweaks'), collapsed: true}">
 
+      <div crm-ui-field="{name: 'inlayForm.modal', title: ts('Modal?')}">
+        <input
+          crm-ui-id="inlayForm.modal"
+          name="modal"
+          ng-model="inlay.config.modal"
+          class="crm-form-text"
+          type="checkbox"
+          />
+        <label crm-ui-for="inlayForm.modal">Present the form as a layer over the whole page that the user cannot ignore.</label>
+      </div>
+
       <div crm-ui-field="{name: 'inlayForm.notBefore', title: ts('Wait how many seconds before allowing a pop-up')}">
         <input
           crm-ui-id="inlayForm.notBefore"

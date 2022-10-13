@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import Input from './Input.svelte';
   import Progress from './Progress.svelte';
   import {CookieService} from './CookieService.js';
@@ -15,7 +15,11 @@
       // Internals
       form, busy = false, progress, pageLoadedTime, windowScrollY, lastScrollY,
       hasScrolledDown = false, dismissedThisSession = false,
-      state = 'hidden';
+      state = 'hidden', // hidden|popup|thanks
+      wrapperTag = (inlay.initData.modal || false) ? 'dialog' : 'div', // div|dialog
+      wrapperElement,// holds the DOM node
+      firstInputField
+  ; 
 
   $: {
     if (!dismissedThisSession) {
@@ -35,6 +39,24 @@
     }
   }
 
+  const changeState = async newState => {
+    const stateIsOpen = state !== 'hidden';
+    const newStateIsOpen = (newState || 'hidden') !== 'hidden';
+    if (wrapperTag === 'dialog' && wrapperElement) {
+      if (newStateIsOpen && !stateIsOpen) {
+        wrapperElement.showModal();
+      }
+      else if (!newStateIsOpen && stateIsOpen) {
+        wrapperElement.close();
+      }
+    }
+    state = newState;
+    if (state === 'popup') {
+      await tick();
+      setTimeout(firstInputField.focus, 400);
+    }
+  }
+
   // Handler for document mouseout
   const mouseOut = e => {
     if ((new Date() - pageLoadedTime) < inlay.initData.notBefore * 1000) {
@@ -43,7 +65,7 @@
     }
     if (!e.toElement && !e.relatedTarget && e.clientY < 10 && state !== 'thanks') {
       // The mouse has exited the document, at the top.
-      state = 'popup';
+      changeState('popup');
     }
   };
 
@@ -72,7 +94,7 @@
 
   function dismissed(e) {
     dismissedThisSession = true;
-    state = 'hidden';
+    changeState('hidden');
     console.log("Signup pop-up dismissed. We have set a cookie 'declinedSignup' which means we won't bother you with it again for " + inlay.initData.cookieExpiryDays + " days.");
     document.removeEventListener('mouseout', mouseOut);
     // Now we have shown the popup, don't show it again for cookieExpiryDays days.
@@ -115,7 +137,7 @@
         r = await inlay.request({ method: 'post', body: Object.assign({token: r.token}, formData )});
         if (r.success) {
           progress.completed();
-          state = 'thanks';
+          changeState('thanks');
           busy = false;
 
           // Now we have shown the popup, don't show it again for cookieExpiryDays days.
@@ -135,89 +157,113 @@
 </script>
 
 <svelte:window bind:scrollY={windowScrollY}/>
-<article class="inlay-signup-overlay {state === 'hidden' ? state : 'popup'}">
-  <h1>{title}</h1>
-  <button on:click|preventDefault={dismissed} class="dismiss" title="Close" >✕</button>
-  {#if state === 'popup'}
-  <form on:submit|preventDefault="{handleSubmit}">
-    <div>
-      {#if introHTML}
-      <div class="wide-col intro">
-        {@html introHTML}
-      </div>
-      {/if}
-      <Input
-        label="First Name"
-        required
-        initialCaps
-        active={!busy}
-        bind:validValue={first_name}
-        class="first-name"
-        name="first_name"
-      />
-      <Input
-        label="Last Name"
-        initialCaps=1
-        active={!busy}
-        bind:validValue={last_name}
-        required
-        class="last-name"
-        name="last_name"
-      />
 
-      <div class="wide-col">
+<svelte:element this={wrapperTag} on:close={dismissed} bind:this={wrapperElement} class="inlay-signup-overlay {state === 'hidden' ? state : 'popup'}">
+  <article>
+    <h1>{title}</h1>
+    <button on:click|preventDefault={dismissed} class="dismiss" title="Close" >✕</button>
+    {#if state === 'popup'}
+    <form on:submit|preventDefault="{handleSubmit}">
+      <div>
+        {#if introHTML}
+        <div class="wide-col intro">
+          {@html introHTML}
+        </div>
+        {/if}
         <Input
-          label="Email"
-          type=email
-          bind:validValue={email}
-          active={!busy}
+          label="First Name"
           required
-          class="email"
-          name="email"
+          initialCaps
+          active={!busy}
+          bind:validValue={first_name}
+          class="first-name"
+          name="first_name"
+          bind:this={firstInputField}
         />
+        <Input
+          label="Last Name"
+          initialCaps=1
+          active={!busy}
+          bind:validValue={last_name}
+          required
+          class="last-name"
+          name="last_name"
+        />
+
+        <div class="wide-col">
+          <Input
+            label="Email"
+            type=email
+            bind:validValue={email}
+            active={!busy}
+            required
+            class="email"
+            name="email"
+          />
+        </div>
+
+        <div class="wide-col submit">
+          <button disabled={ busy } type=submit class="submit" >{busy ? 'Please wait...' : submitButtonText}</button>
+          <Progress bind:this={progress} />
+        </div>
+
+        <div class="wide-col smallprint">{@html smallprintHTML}</div>
+
+        <!--<pre> {JSON.stringify({first_name, last_name, email, x: [first_name!==null, last_name!==null, email!==null,  first_name!== null && last_name !== null  && email !==null ]})} </pre>-->
       </div>
-
-      <div class="wide-col submit">
-        <button disabled={ busy } type=submit class="submit" >{busy ? 'Please wait...' : submitButtonText}</button>
-        <Progress bind:this={progress} />
+    </form>
+    {:else if state == 'thanks'}
+      <div class="thanks">
+        {@html thanksHTML}
       </div>
-
-      <div class="wide-col smallprint">{@html smallprintHTML}</div>
-
-      <!--<pre> {JSON.stringify({first_name, last_name, email, x: [first_name!==null, last_name!==null, email!==null,  first_name!== null && last_name !== null  && email !==null ]})} </pre>-->
-    </div>
-  </form>
-  {:else if state == 'thanks'}
-    <div class="thanks">
-      {@html thanksHTML}
-    </div>
-  {/if}
-</article>
+    {/if}
+  </article>
+</svelte:element>
 
 <style lang=scss >
   // The default state is hidden:
-  article.inlay-signup-overlay {
+
+  dialog.inlay-signup-overlay {
+    &::backdrop {
+      background: rgba(0, 0, 0, 0);
+      transition: all 1s;
+    }
+    &.popup::backdrop {
+      background: rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  div.inlay-signup-overlay {
     position: fixed;
     z-index: 1;
     bottom: 0;
     right: 0;
-    width: 23rem;
     height: auto;
-    max-height: 100vh;
-    overflow-y: auto;
-    background: white;
-    transform: translateY(100%);
-    opacity: 0;
-    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.2s linear;
     box-shadow: -10px -10px 30px 0 rgba(0,0,0,0.2);
-    padding: 1rem;
     &.hidden {
       pointer-events: none;
     }
   }
-  article.inlay-signup-overlay.popup {
+
+  // This is both dialog and original type
+  .inlay-signup-overlay {
+    border:none;
+    opacity: 0;
+    width: 23rem;
+    max-height: 100vh;
+    overflow-y: auto;
+    background: white;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.2s linear;
+    padding: 1rem;
+  }
+  .inlay-signup-overlay.popup {
     transform: none;
     opacity: 1;
+  }
+  .inlay-signup-overlay>article {
+  }
+  .inlay-signup-overlay.popup>article {
   }
 
   h1 {
@@ -236,13 +282,13 @@
     grid-column: 1/3;
   }
 
-  article.inlay-signup-overlay :global(input) {
+  .inlay-signup-overlay :global(input) {
     /* Override site's style which has it looking faded */
     color: #222;
   }
 
-  article.inlay-signup-overlay :global(.intro),
-  article.inlay-signup-overlay :global(.intro p)
+  .inlay-signup-overlay :global(.intro),
+  .inlay-signup-overlay :global(.intro p)
   {
     font-size: 1rem; /* 16px */
     margin-bottom: 0;
@@ -250,22 +296,22 @@
   .intro :global(p) {
     margin-bottom: 0;
   }
-  article.inlay-signup-overlay :global(.intro p + p) {
+  .inlay-signup-overlay :global(.intro p + p) {
     margin-bottom: 1rem;
   }
 
-  article.inlay-signup-overlay :global(.smallprint),
-  article.inlay-signup-overlay :global(.smallprint p) {
+  .inlay-signup-overlay :global(.smallprint),
+  .inlay-signup-overlay :global(.smallprint p) {
     opacity: 0.8;
     font-size: 0.8rem;
     margin-bottom: 0;
   }
-  article.inlay-signup-overlay :global(.smallprint p + p) {
+  .inlay-signup-overlay :global(.smallprint p + p) {
     margin-bottom: 1rem;
   }
 
   /* Bump progress into the grid gap */
-  article.inlay-signup-overlay :global(progress) {
+  .inlay-signup-overlay :global(progress) {
     transform: translateY(0.5rem);
   }
 

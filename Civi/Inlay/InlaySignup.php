@@ -22,6 +22,7 @@ class InlaySignup extends InlayType {
     'cookieExpiryDays' => 90,
     'customCSS'        => '',
     'notWhenUrlIs'     => '',
+    'modal'            => FALSE,
 
     'mailingGroup'     => NULL,
     'welcomeEmailID'   => NULL,
@@ -52,6 +53,7 @@ class InlaySignup extends InlayType {
       'minScrollPercent' => $this->config['minScrollPercent'],
       'customCSS'        => $this->config['customCSS'],
       'notWhenUrlIs'     => $this->config['notWhenUrlIs'],
+      'modal'            => $this->config['modal'],
       'cookieExpiryDays' => $this->config['cookieExpiryDays'],
     ];
   }
