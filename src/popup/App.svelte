@@ -88,7 +88,7 @@
       document.addEventListener('mouseout', mouseOut);
     }
     else {
-      console.log("We will not offer you a signup pop-up because you have previously declined. Unset your declinedSignup cookie to reset this.");
+      console.info("We will not offer you a signup pop-up because you have previously declined. Unset your declinedSignup cookie to reset this.");
       dismissedPopup = true;
     }
 
