@@ -14,7 +14,7 @@
       first_name, last_name, email,
       // Internals
       form, busy = false, progress, pageLoadedTime, windowScrollY, lastScrollY,
-      hasScrolledDown = false, dismissedThisSession = false,
+      hasScrolledDown = false, dismissedPopup = false,
       state = 'hidden', // hidden|popup|thanks
       wrapperTag = (inlay.initData.modal || false) ? 'dialog' : 'div', // div|dialog
       wrapperElement,// holds the DOM node
@@ -22,7 +22,7 @@
   ; 
 
   $: {
-    if (!dismissedThisSession) {
+    if (!dismissedPopup) {
       if (!hasScrolledDown) {
         const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
 
@@ -82,6 +82,7 @@
     }
     else {
       console.log("We will not offer you a signup pop-up because you have previously declined. Unset your declinedSignup cookie to reset this.");
+      dismissedPopup = true;
     }
 
     if (inlay.initData.customCSS.replace(/\s+/, '') && !document.getElementById('custom-style-' + inlay.publicID)) {
@@ -93,7 +94,7 @@
   });
 
   function dismissed(e) {
-    dismissedThisSession = true;
+    dismissedPopup = true;
     changeState('hidden');
     console.log("Signup pop-up dismissed. We have set a cookie 'declinedSignup' which means we won't bother you with it again for " + inlay.initData.cookieExpiryDays + " days.");
     document.removeEventListener('mouseout', mouseOut);
