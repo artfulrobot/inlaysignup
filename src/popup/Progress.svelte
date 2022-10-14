@@ -54,10 +54,8 @@
     border: none;
 
     height: 0.5rem;
-    /* IE bar colour */
-    color: #0162B7;
-    /* Firefox background */
-    background-color: #eee;
+    color: var(--inlay-progress-bar-color, #0162B7);
+    background-color: var(--inlay-progress-background-color, #eee);
   }
 
   /* For some reason webkit browsers seem to ignore any rules targeting pseudo
@@ -66,16 +64,16 @@
    * progress::-pseudo */
   /* this is the coloured bar representing the value */
   :global(progress::-webkit-progress-value) {
-    background-color: #0162B7;
+    background-color: var(--inlay-progress-bar-color, #0162B7);
   }
   /* this is how to set the background for the bar's domain in webkit */
   :global(progress::-webkit-progress-bar) {
-    background-color: #eee;
+    background-color: var(--inlay-progress-background-color, #eee);
   }
 
   /* this is how to set the background for the bar's domain in firefox */
   progress::-moz-progress-bar {
-    background-color: #0162B7;
+    background-color: var(--inlay-progress-bar-color, #0162B7);
     border:none;
   }
 
