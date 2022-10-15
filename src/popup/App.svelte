@@ -122,6 +122,7 @@
     const formData = { first_name, last_name, email, source: window.location.href };
 
     busy = true;
+    progress.startTimer(2, 10);
     let r = await inlay.request({ method: 'post', body: formData});
 
     if (r.error) {
@@ -151,6 +152,11 @@
           // Now we have shown the popup, don't show it again for cookieExpiryDays days.
           console.info("We have set a cookie 'declinedSignup' which means we won't bother you with the pop-up again. The cookie expires in " + inlay.initData.cookieExpiryDays + " days.");
           CookieService.setCookie('declinedSignup', true, inlay.initData.cookieExpiryDays);
+
+          // Allow others to take action, e.g. for analytics.
+          let e = new Event('InlaySignupComplete');
+          e.inlay = inlay;
+          document.dispatchEvent(e);
         }
         else {
           alert("Sorry, there was a problem with the form: " + (r.error || 'unknown error'));
