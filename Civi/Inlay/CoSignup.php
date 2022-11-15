@@ -25,6 +25,7 @@ class CoSignup extends InlayType {
     'tweet'            => '',
     'whatsappText'     => '',
     'welcomeEmailID'   => NULL,
+    'css'              => '',
     //'assignee'         => NULL, xxx
     // 'smallprintHTML'   => NULL,
     // 'phoneAsk'         => TRUE,
@@ -36,21 +37,6 @@ class CoSignup extends InlayType {
    * @var string
    */
   public static $editURLTemplate = 'civicrm/a?#/inlays/CoSignup/{id}';
-
-  /**
-   * Sets the config ensuring it's valid.
-   *
-   * This implementation simply ensures all the defaults exist, and that no
-   * other keys exist, but you could do other things, especially if you need to
-   * coerce some old config into a new style.
-   *
-   * @param array $config
-   *
-   * @return \Civi\Inlay\Type (this)
-   */
-  public function setConfig(array $config) {
-    $this->config = array_intersect_key($config + static::$defaultConfig, static::$defaultConfig);
-  }
 
   /**
    * Generates data to be served with the Javascript application code bundle.
@@ -69,6 +55,7 @@ class CoSignup extends InlayType {
       // 'smallprintHTML',
       'webThanksHTML',
       'socialStyle',
+      'css',
       //'instructionsHTML', // 'phoneAsk'
     ] as $_) {
       $data[$_] = $this->config[$_] ?? '';

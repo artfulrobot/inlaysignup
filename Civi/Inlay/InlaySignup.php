@@ -17,6 +17,7 @@ class InlaySignup extends InlayType {
     'mailingGroup'     => NULL,
     'welcomeEmailID'   => NULL,
     'webThanksHTML'    => NULL,
+    'css'              => '',
   ];
 
   /**
@@ -25,21 +26,6 @@ class InlaySignup extends InlayType {
    * @var string
    */
   public static $editURLTemplate = 'civicrm/a?#/inlays/signup/{id}';
-
-  /**
-   * Sets the config ensuring it's valid.
-   *
-   * This implementation simply ensures all the defaults exist, and that no
-   * other keys exist, but you could do other things, especially if you need to
-   * coerce some old config into a new style.
-   *
-   * @param array $config
-   *
-   * @return \Civi\Inlay\Type (this)
-   */
-  public function setConfig(array $config) {
-    $this->config = array_intersect_key($config + static::$defaultConfig, static::$defaultConfig);
-  }
 
   /**
    * Generates data to be served with the Javascript application code bundle.
@@ -53,6 +39,7 @@ class InlaySignup extends InlayType {
       'signupButtonText' => $this->config['signupButtonText'],
       'webThanksHTML'    => $this->config['webThanksHTML'],
       'smallprintHTML'   => $this->config['smallprintHTML'],
+      'css'    => $this->config['css'],
     ];
   }
 

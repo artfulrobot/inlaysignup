@@ -10,7 +10,7 @@
 
       <div class="isco-2-cols">
         <div class="isco-input-wrapper">
-          <label :for="myId + 'fname'" >First name</label>
+          <label :for="myId + 'fname'" >Name</label>
           <input
             required
             type="text"
@@ -19,6 +19,7 @@
             :ref="first_name"
             :disabled="$root.submissionRunning"
             v-model="first_name"
+            aria-label="First name"
             />
         </div>
         <div class="isco-input-wrapper">
@@ -31,6 +32,7 @@
             :ref="last_name"
             :disabled="$root.submissionRunning"
             v-model="last_name"
+            aria-label="Last name"
             />
         </div>
       </div>
@@ -68,7 +70,6 @@
         <div class="isco-input-wrapper">
           <label :for="myId + 'organisation'" >Organisation</label>
           <input
-            required
             type="text"
             :id="myId + 'organisation'"
             name="organisation"
@@ -281,6 +282,13 @@ export default {
           progress.cancelTimer();
         });
     }
+  },
+  mounted() {
+    // Add our CSS.
+    let style = document.createElement('style');
+    style.innerHTML = this.inlay.initData.css;
+    document.head.appendChild(style);
+    console.log("Added CSS");
   }
 }
 </script>

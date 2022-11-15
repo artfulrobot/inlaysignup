@@ -20,13 +20,13 @@ import './coDownload.scss';
     'No' : 'Nein',
     'Thank you.' : 'Vielen Dank ',
     'Just a mo...' : 'Einen Augenblick...',
-    'Your download should begin automatically after a few seconds. If not use this <a>direct download link</a>':
-      'Ihr Download sollte nach wenigen Sekunden automatisch beginnen. Falls nicht, verwenden Sie bitte diesen <a>direkten Download-Link</a>',
+    'Your download should begin automatically after a few seconds.<br/>If not use this <a>direct download link</a>':
+      'Ihr Download sollte nach wenigen Sekunden automatisch beginnen.<br/>Falls nicht, verwenden Sie bitte diesen <a>direkten Download-Link</a>',
     'Please check your email; the two don’t match' : 'Keine Übereinstimmung; bitte überprüfen Sie Ihre E-Mail Adresse',
     'Sorry, there was a problem with the form' : 'Entschuldigung, es gab ein Problem mit dem Onlineformular',
 
     'It would be very helpful to understand how and where you intend to use these insights - could you give us a sense please?' : 'Wir würden gerne besser verstehen, wie unsere Handreichung für Sie nützlich sein kann. Könnten Sie uns mitteilen, wie Sie die Erkenntnisse in Ihrer Arbeit zu nutzen gedenken?',
-    '<h2>We hope you find this resource&nbsp;useful -&nbsp;please do let us know what you think!</h2>' : '<h2>Wir hoffen, dass Sie diese Handreichung nützlich finden - wir freuen uns über Rückmeldungen!</h2>',
+    '<h2>We hope you find this resource useful -&nbsp;please do let us know what you think!</h2>' : '<h2>Wir hoffen, dass Sie diese Handreichung nützlich finden - wir freuen uns über Rückmeldungen!</h2>',
 
     'We\'d truly appreciate your support in helping us ensure our resources are as impactful as possible. May we send you a few questions about how you\'ve used the resource in a couple of months?':
       'Ihr Feedback hilft uns dabei, unsere Ressourcen so anwendungsorientiert wie möglich zu gestalten. Dürfen wir Ihnen in ein paar Monaten ein paar Fragen zusenden, um zu erfahren, wie Sie diese Handreichung genutzt haben?',
@@ -265,7 +265,7 @@ import './coDownload.scss';
           </form>
           <div class="idl-thanks">
             <div class="text">${ts('Thank you.')}</div>
-            <p>${ts('Your download should begin automatically after a few seconds. If not use this <a>direct download link</a>')}</p>
+            <p>${ts('Your download should begin automatically after a few seconds.<br/>If not use this <a>direct download link</a>')}</p>
           </div>
         </div>
       </div>

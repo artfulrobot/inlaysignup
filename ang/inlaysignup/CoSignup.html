@@ -177,6 +177,14 @@
     -->
 
     <!-- todo email assignee? -->
+    <div crm-ui-field="{name: 'inlayForm.css', title: ts('CSS')}" >
+      <textarea
+          crm-ui-id="inlayForm.css"
+          name="css"
+          ng-model="inlay.config.css"
+          class="crm-form-text"
+          ></textarea>
+    </div>
 
     <div>
       <button ng-click="save()">{{ts('Save')}}</button>
