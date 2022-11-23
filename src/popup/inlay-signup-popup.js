@@ -26,7 +26,7 @@ import App from './App.svelte';
       if (inlay.initData.notWhenUrlIs) {
         let disabled = false,
             url = window.location.href;
-        inlay.initData.notWhenUrlIs.split(/\r\n+/).map(pattern => {
+        inlay.initData.notWhenUrlIs.split(/[\r\n]+/).map(pattern => {
           let re = (new RegExp(pattern));
           if (!re) {
             console.log("Failed to make regexp from", pattern);
