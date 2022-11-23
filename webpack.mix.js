@@ -19,25 +19,24 @@ mix
       // The JS gets transpiled to es6, before svelte compiles it
       // I don't know whether Mix then further babels the finished js?
       // I don't think I need to support
-      babel: {
-        presets: [
-          [
-            '@babel/preset-env',
-            {
-              loose: true,
-              // No need for babel to resolve modules
-              modules: false,
-              // This seems to be the most browsers we can support without triggering
-              // warnings and requiring <svelte:options accessors={true}/>
-              targets: "> 0.35%, not dead, not IE<=11"
-              // targets: {
-              //   // ! Very important. Target es6+
-              //   esmodules: true,
-              // }
-            },
-          ],
-        ],
-      },
+      // babel: {
+      //   presets: [
+      //     [
+      //       '@babel/preset-env',
+      //       {
+      //         loose: true,
+      //         // No need for babel to resolve modules
+      //         modules: false,
+      //         // This seems to be the most browsers we can support without triggering
+      //         // warnings and requiring <svelte:options accessors={true}/>
+      //         targets: {
+      //           // ! Very important. Target es6+
+      //           esmodules: true,
+      //         }
+      //       },
+      //     ],
+      //   ],
+      // },
     }),
   })
 ;
