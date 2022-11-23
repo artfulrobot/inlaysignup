@@ -14,8 +14,13 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 It's an [Inlay](https://lab.civicrm.org/extensions/inlay) so once installed go
 to Administer » Inlays and create a new pop-up signup form.
 
-## Hooks
+## PHP Hooks
 
 You can completely override the processing of the first, last, email data sent
 by implementing a listener on `Civi\Inlay\InlaySignup::PROCESS_EVENT` and
 modifying the `$event->chain` which contains callbacks.
+
+## Javascript Hooks
+
+On successful submission, an `InlaySignupCompleted` event is dispatched on the `document` node. You may want to `document.addEventListener('InlaySignupCompleted', yourHanderFunction)` to, for example, send analytics if the user has opted-in.
+

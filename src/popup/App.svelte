@@ -18,8 +18,9 @@
       state = 'hidden', // hidden|popup|thanks
       wrapperTag = (inlay.initData.modal || false) ? 'dialog' : 'div', // div|dialog
       wrapperElement,// holds the DOM node
-      firstInputField
-  ; 
+      firstInputField,
+      debug = CiviCRMInlay.debug || (() => {})
+    ; 
 
   $: {
     if (!dismissedPopup) {
@@ -28,16 +29,19 @@
 
         if (Math.floor(windowScrollY/(document.body.scrollHeight - vh)*100) >= inlay.initData.minScrollPercent) {
           hasScrolledDown = true;
+          debug("inlaysignup: scrolled at least", inlay.initData.minScrollPercent, "%");
         }
         lastScrollY = windowScrollY;
       }
       else {
         if (windowScrollY < lastScrollY - 20 && state !== 'thanks') {
-          state = 'popup';
+          debug("inlaysignup: triggering as scrolling up");
+          changeState('popup');
         }
       }
     }
   }
+
 
   const changeState = async newState => {
     const stateIsOpen = state !== 'hidden';
@@ -56,15 +60,18 @@
       setTimeout(firstInputField.focus, 400);
     }
   }
+  debug("inlaysignup changeState - trigger with popup/thanks/hidden", {changeState});
 
   // Handler for document mouseout
   const mouseOut = e => {
     if ((new Date() - pageLoadedTime) < inlay.initData.notBefore * 1000) {
       // Don't do anything until they've been on the page 10s.
+      debug("Ignoring mouse out as timeout not exceeded.");
       return;
     }
     if (!e.toElement && !e.relatedTarget && e.clientY < 10 && state !== 'thanks') {
       // The mouse has exited the document, at the top.
+      debug("Triggering on mouse out as timeout not exceeded.");
       changeState('popup');
     }
   };
@@ -96,7 +103,7 @@
   function dismissed(e) {
     dismissedPopup = true;
     changeState('hidden');
-    console.log("Signup pop-up dismissed. We have set a cookie 'declinedSignup' which means we won't bother you with it again for " + inlay.initData.cookieExpiryDays + " days.");
+    console.info("Signup pop-up dismissed. We have set a cookie 'declinedSignup' which means we won't bother you with it again for " + inlay.initData.cookieExpiryDays + " days.");
     document.removeEventListener('mouseout', mouseOut);
     // Now we have shown the popup, don't show it again for cookieExpiryDays days.
     CookieService.setCookie('declinedSignup', true, inlay.initData.cookieExpiryDays);
@@ -115,6 +122,7 @@
     const formData = { first_name, last_name, email, source: window.location.href };
 
     busy = true;
+    progress.startTimer(2, 10);
     let r = await inlay.request({ method: 'post', body: formData});
 
     if (r.error) {
@@ -128,11 +136,11 @@
       return;
     }
     else if (r.token) {
-      //console.log("Token received, waiting 5s");
+      debug("Token received, waiting 5s");
       // Expect it to take 6s to get to 80% though we'll be done in 5.
       progress.startTimer(6, 80);
       setTimeout(async () => {
-        // console.log("Sending 2nd request, with token");
+        debug("Sending 2nd request, with token");
         // Expect it to take 2s to get to 100%
         progress.startTimer(2, 100);
         r = await inlay.request({ method: 'post', body: Object.assign({token: r.token}, formData )});
@@ -142,8 +150,13 @@
           busy = false;
 
           // Now we have shown the popup, don't show it again for cookieExpiryDays days.
-          console.log("We have set a cookie 'declinedSignup' which means we won't bother you with the pop-up again. The cookie expires in " + inlay.initData.cookieExpiryDays + " days.");
+          console.info("We have set a cookie 'declinedSignup' which means we won't bother you with the pop-up again. The cookie expires in " + inlay.initData.cookieExpiryDays + " days.");
           CookieService.setCookie('declinedSignup', true, inlay.initData.cookieExpiryDays);
+
+          // Allow others to take action, e.g. for analytics.
+          let e = new Event('InlaySignupComplete');
+          e.inlay = inlay;
+          document.dispatchEvent(e);
         }
         else {
           alert("Sorry, there was a problem with the form: " + (r.error || 'unknown error'));
@@ -203,7 +216,7 @@
           />
         </div>
 
-        <div class="wide-col submit">
+        <div class="wide-col name-submit">
           <button disabled={ busy } type=submit class="submit" >{busy ? 'Please wait...' : submitButtonText}</button>
           <Progress bind:this={progress} />
         </div>
@@ -221,15 +234,11 @@
   </article>
 </svelte:element>
 
-<style lang=scss >
+<style lang=scss global>
   // The default state is hidden:
 
   dialog.inlay-signup-overlay {
     &::backdrop {
-      background: rgba(0, 0, 0, 0);
-      transition: all 1s;
-    }
-    &.popup::backdrop {
       background: rgba(0, 0, 0, 0.25);
     }
   }
@@ -344,6 +353,41 @@
     color: #777;
   }
 
+  .inlay-signup-overlay {
+    .input-wrapper, .input-wrapper * {
+      box-sizing: border-box;
+    }
+    .input-wrapper {
+      position: relative;
+      width: 100%;
+      display: inline-block;
+      vertical-align: top;
+    }
+    .input-wrapper label {
+      padding-right: 2rem;
+      display: block;
+    }
+    .input-wrapper.invalid label {
+      color: #a00;
+    }
+    .input-wrapper label .ok {
+      position: absolute;
+      right: 0;
+      color: #080;
+      width: 2rem;
+      text-align: center;
+    }
+    .error { color: #a00; }
+
+    input {
+      display: block;
+      width: 100%;
+    }
+
+    input:valid {
+      border-color: #0a0;
+    }
+  }
 
 </style>
 
