@@ -52,7 +52,7 @@ class SignupA extends InlayType {
       'init'             => 'inlaySignupAInit',
     ];
     foreach (['socialStyle', 'submitButtonText', 'publicTitle', 'smallprintHTML', 'webThanksHTML', 'instructionsHTML', // 'phoneAsk'
-      'preFormHTML', 'postFormHTML', 'newsletterLabelText'
+      'preFormHTML', 'postFormHTML', 'newsletterLabelText', 'css'
     ] as $_) {
       $data[$_] = $this->config[$_] ?? '';
     }
