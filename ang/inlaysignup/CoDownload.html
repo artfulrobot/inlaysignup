@@ -69,14 +69,14 @@
       </div>
 
       <div crm-ui-field="{name: 'inlayForm.followupMessageFromID', title: ts('From address')}">
-        <select
-          crm-ui-select="{allowClear:true, dropdownAutoWidth: true }"
-          style="width: 100%"
-          ng-model="inlay.config.followupMessageFromID"
-          ng-options="i.label for i in fromAddresses track by i.value"
-          >
-          <option value="">(default)</option>
-        </select>
+          <select
+            crm-ui-select="{allowClear:true, dropdownAutoWidth: true }"
+            style="width: 100%"
+            ng-model="inlay.config.followupMessageFromID"
+            ng-options="i.value as i.label for i in fromAddresses"
+            >
+            <option value="">(default)</option>
+          </select>
       </div>
 
       <p>You can map report titles to specific followup emails</p>
@@ -95,15 +95,15 @@
             </td>
             <td>
               <select
-                style="width: 100%"
-                crm-id="'followup' + i"
-                crm-ui-select="{dropdownAutoWidth: true}"
-                ng-model="inlay.config.followupMaps[i].messageTplID"
-                ng-options="i.msg_title + ' | ' + i.msg_subject for i in messageTpls track by i.id"
-                >
-              </select>
+                  crm-id="'followup' + i"
+                  style="width: 100%"
+                  crm-ui-select="{dropdownAutoWidth: true}"
+                  ng-model="inlay.config.followupMaps[i].messageTplID"
+                  ng-options="msgTpl.id as ellipsify(msgTpl.msg_title + ' | ' + msgTpl.msg_subject) for msgTpl in messageTpls"
+                  >
+                </select>
               <div ng-show="i === 0 && (!row.messageTplID) && inlay.config.followupText.length > 0" class="crm-message crm-error error message">
-                As you have specified follow up text, you must choose at the default message template.
+                As you have specified follow up text, you must choose the default message template.
               </div>
             </td>
             <td>

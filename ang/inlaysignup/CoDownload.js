@@ -69,7 +69,15 @@
         config: JSON.parse(JSON.stringify($scope.inlayType.defaultConfig)),
       };
     }
+    // Ensure messageTplID values are integers.
+    $scope.inlay.config.followupMaps.forEach(o => {
+      if (typeof o.messageTplID === 'string' && o.messageTplID !== '') {
+        o.messageTplID = parseInt(o.messageTplID);
+      }
+    });
     const inlay = $scope.inlay;
+
+    $scope.ellipsify = x => (x.length > 80) ? (x.substr(0, 80) + '...') : x;
 
     $scope.save = function() {
       return crmStatus(
