@@ -23,8 +23,8 @@
                   ["is_active", "=", true], ["is_sms", "=", false],
                   ["workflow_id", "IS NULL"]
                 ],
-                orderBy: {msg_title: 'ASC'}},
-                'id']
+                orderBy: {msg_title: 'ASC'}}
+                ]
             };
             if ($route.current.params.id > 0) {
               params.inlay = ['Inlay', 'get', {where: [["id", "=", $route.current.params.id]]}, 0];
@@ -49,6 +49,9 @@
     $scope.inlayType = various.inlayTypes['Civi\\Inlay\\CoSignup'];
     console.log({various}, $scope.inlayType);
     $scope.mailingGroups = various.groups;
+
+    // Ensure messageTpls' .id props are ints.
+    various.messageTpls.forEach(m => { m.id = parseInt(m.id); });
     $scope.messageTpls = various.messageTpls;
 
     if (various.inlay) {
@@ -64,6 +67,12 @@
       };
     }
     const inlay = $scope.inlay;
+
+    // Ensure we're dealing with an integer IDs or ng-options fails.
+    if (typeof $scope.inlay.config.welcomeEmailID === 'string' && $scope.inlay.config.welcomeEmailID !== '') {
+      $scope.inlay.config.welcomeEmailID = parseInt($scope.inlay.config.welcomeEmailID);
+      console.log("coerced welcomeEmailID to int", $scope.inlay.config.welcomeEmailID);
+    }
 
     // Define all the networks we support here.
     const knownSocials = {

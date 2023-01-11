@@ -100,7 +100,7 @@
         style="width: 100%"
         crm-ui-select="{dropdownAutoWidth: true, allowClear: true}"
         ng-model="inlay.config.welcomeEmailID"
-        ng-options="i.msg_title + ' | ' + i.msg_subject for i in messageTpls track by i.id"
+        ng-options="i.id as '[' + i.id + '] ' + i.msg_title + ' | ' + i.msg_subject for i in messageTpls"
         >
       </select>
     </div>
