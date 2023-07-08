@@ -8,6 +8,7 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 * PHP v7.4+
 * CiviCRM 5.49+
+* Inlay 1.3+
 
 ## Brief how-to
 

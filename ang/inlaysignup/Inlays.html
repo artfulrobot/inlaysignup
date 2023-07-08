@@ -156,8 +156,45 @@
           name="notWhenUrlIs"
           ng-model="inlay.config.notWhenUrlIs"
           class="crm-form-text"
+          ng-change="checkPatternErrors()"
+          rows=5
           ></textarea>
-        <p>Put one pattern per line. If any match the URL that the inlay is placed on, it will not popup. Patterns are Javascript regular expressions, without the /delimeters/.</p>
+        <label style="display:block;"
+        >Enter a URL here to test if your patterns match it.<br>
+        <input
+          type=text
+          ng-model="$ctrl.patternTestURL"
+          ng-change="checkPatternErrors()"
+          style="width: 100%"
+          /></label>
+        <ul>
+          <li ng-repeat="e in (patternCheckResults || [])">
+            <code>{{e.pattern}}</code>
+            <span ng-if="e.status === 'error'" style="color:#200;background:#f66;padding:0 1em;">Invalid pattern!</span>
+            <span ng-if="e.status === 'matches'" style="color:#068">Matches URL</span>
+            <span ng-if="e.status === 'nomatch'" style="color:#666">Does not match URL</span>
+            <span ng-if="e.status === 'ok'" style="color:#070">Pattern is valid</span>
+          </li>
+        </ul>
+        <p>Put one pattern per line. If any match the URL that the inlay is placed on, it will not popup.</p>
+        <p>You can use two types of pattern here</p>
+        <ol>
+          <li><p.Simple: <code>*</code> means zero or more of any character. You <em>must</em> start the pattern with a <code>*</code>. Example:<br/>
+            <pre>*/blog/*plunk</pre>
+            would disable the popup on pages like<br>
+            https://example.org/blog/kerplunk<br>
+            https://example.org/blog/nice-sounds/plunk</p>
+          </li>
+          <li><p>Advanced: You can write a Javascript regular expression without the /delimeters/. Note that the pattern is matched against location.href - the full URL For example, if you had pages on
+            your site that had another sign up form and you didn't want this one popping up confusing things:<br>
+            <pre>\/(en|fr|de|es)\/newsletter-signup</pre>
+            Would disable the popup on pages like<br>
+            https://example.org/en/newsletter-signup<br>
+            https://example.org/fr/newsletter-signup<br>
+            https://example.org/de/newsletter-signup<br>
+            https://example.org/es/newsletter-signup</p>
+          </li>
+        </ol>
       </div>
     </div>
 

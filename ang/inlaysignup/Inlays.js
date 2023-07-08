@@ -44,6 +44,7 @@
     // The ts() and hs() functions help load strings for this module.
     var ts = $scope.ts = CRM.ts('inlaysignup');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/inlaysignup/Inlays'}); // See: templates/CRM/inlaysignup/Inlays.hlp
+    let ctrl = this;
 
     $scope.inlayType = various.inlayTypes['Civi\\Inlay\\InlaySignup'];
     console.log({various}, $scope.inlayType);
@@ -62,6 +63,35 @@
       };
     }
     const inlay = $scope.inlay;
+
+
+    $scope.patternCheckResults = [];
+    ctrl.patternTestURL = '';
+    $scope.checkPatternErrors = () => {
+      console.log("check patttern", ctrl.patternTestURL);
+      $scope.patternCheckResults = [];
+      $scope.inlay.config.notWhenUrlIs.split(/[\r\n]+/).map(pattern => {
+        const item = {pattern: pattern, status: 'error'};
+        if (pattern[0] === '*') {
+          // Support simple patterns where * means any number of chars. Convert that to a regex:
+          pattern = pattern.split('*').slice(1).map(part => part.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')).join('.*');
+          // console.log("Converted ", {origPat, pattern});
+        }
+        let re;
+        try { re = new RegExp(pattern); }
+        catch (e) {}
+        if (re) {
+          if (ctrl.patternTestURL) {
+            item.status = ctrl.patternTestURL.match(re) ? 'matches' : 'nomatch';
+          }
+          else {
+            item.status = 'ok';
+          }
+        }
+        $scope.patternCheckResults.push(item);
+      });
+    };
+    $scope.checkPatternErrors();
 
     $scope.save = function() {
       return crmStatus(

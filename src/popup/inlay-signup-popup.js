@@ -23,25 +23,29 @@ import App from './App.svelte';
      */
     window.inlaySignupInit = inlay => {
 
+      let disabled = false;
       if (inlay.initData.notWhenUrlIs) {
-        let disabled = false,
-            url = window.location.href;
+        let url = window.location.href;
         inlay.initData.notWhenUrlIs.split(/[\r\n]+/).map(pattern => {
+          const origPat = pattern;
+          if (pattern[0] === '*') {
+            // Support simple patterns where * means any number of chars. Convert that to a regex:
+            pattern = pattern.split('*').slice(1).map(part => part.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')).join('.*');
+            // console.log("Converted ", {origPat, pattern});
+          }
           let re = (new RegExp(pattern));
           if (!re) {
-            console.log("Failed to make regexp from", pattern);
-            return;
+            console.log("Failed to make regexp from", origPat);
           }
-          disabled |= url.match(re) ? true : false;
-          if (disabled) {
-            console.log("inlaySignupInit disabled by rule:", pattern);
+          else if (url.match(re)) {
+            disabled = true;
+            console.log("inlaySignupInit disabled by rule:", origPat);
           }
         });
-
-        if (disabled) {
-            console.log("inlaySignupInit disabled ");
-          return;
-        }
+      }
+      if (disabled) {
+        console.log("inlaySignupInit disabled by rule, not booting.");
+        return;
       }
 
       // Here we create a node after the <script/> tag to hold the form.
