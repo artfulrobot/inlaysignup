@@ -301,7 +301,7 @@ import './coDownload.scss';
         questionResponse: downloadAppDiv.querySelector('.question textarea'),
         followupLabel: downloadAppDiv.querySelector('.followup label span'),
         followup: downloadAppDiv.querySelector('.followup select'),
-        followupContainer: followup.parentElement,
+        followupContainer: downloadAppDiv.querySelector('.followup'),
       };
 
       // Set up the thanks and hide it.
