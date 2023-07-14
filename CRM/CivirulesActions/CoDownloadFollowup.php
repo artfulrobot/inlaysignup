@@ -36,6 +36,8 @@ class CRM_CivirulesActions_CoDownloadFollowup extends CRM_Civirules_Action {
       throw new Exception($message);
     }
 
+    \Civi::log()->info("Got activity: " . json_encode($triggeringActivity, JSON_PRETTY_PRINT));
+
     // Load the inlay.
     try {
       $inlayData = \Civi\Api4\Inlay::get(FALSE)
@@ -48,15 +50,12 @@ class CRM_CivirulesActions_CoDownloadFollowup extends CRM_Civirules_Action {
         throw new Exception($message);
       }
       $inlay = \Civi\Inlay\Type::fromArray($inlayData);
+      $inlay->sendFollowup($triggeringActivity, $contactID);
     }
     catch (\Exception $e) {
       \Civi::log()->error($e->getMessage());
       throw $e;
     }
-
-    // check its subject against the inlay map.
-    $messageTemplateID = $inlay->sendFollowup($triggeringActivity, $contactID);
-    \Civi::log()->info("Got activity: " . json_encode($triggeringActivity, JSON_PRETTY_PRINT));
 
 
   }

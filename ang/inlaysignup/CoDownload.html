@@ -97,10 +97,11 @@
               <select
                   crm-id="'followup' + i"
                   style="width: 100%"
-                  crm-ui-select="{dropdownAutoWidth: true}"
+                  crm-ui-select="{allowClear:true, dropdownAutoWidth: true }"
                   ng-model="inlay.config.followupMaps[i].messageTplID"
                   ng-options="msgTpl.id as ellipsify(msgTpl.msg_title + ' | ' + msgTpl.msg_subject) for msgTpl in messageTpls"
                   >
+                <option value="">(do not send a followup)</option>
                 </select>
               <div ng-show="i === 0 && (!row.messageTplID) && inlay.config.followupText.length > 0" class="crm-message crm-error error message">
                 As you have specified follow up text, you must choose the default message template.

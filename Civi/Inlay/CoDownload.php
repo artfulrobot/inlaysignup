@@ -21,7 +21,7 @@ class CoDownload extends InlayType {
     'followupText'          => NULL,
     'smallprintHTML'        => NULL,
     'followupMaps'          => [['reportTitle' => 'default', 'messageTplID' => NULL]],
-    'followupMessageFromID' => NULL, /* actually it's "value" */
+    'followupMessageFromID' => NULL, /* actually its "value" */
   ];
 
   /**
@@ -37,6 +37,16 @@ class CoDownload extends InlayType {
    * @return array
    */
   public function getInitData() :array {
+
+    // Export a list of report titles that do not send followups.
+
+    $noFollowup = [];
+    foreach ($this->config['followupMaps'] as $item) {
+      if (empty($item['messageTplID'])) {
+        $noFollowup[] = $item['reportTitle'];
+      }
+    }
+
     return [
       // Name of global Javascript function used to boot this app.
       'init'           => 'inlayCoDownloadInit',
@@ -45,6 +55,7 @@ class CoDownload extends InlayType {
       'smallprintHTML' => $this->config['smallprintHTML'],
       'buttonText'     => $this->config['buttonText'],
       'webThanksHTML'  => $this->config['webThanksHTML'],
+      'noFollowup'     => $noFollowup,
     ];
   }
 
@@ -69,7 +80,7 @@ class CoDownload extends InlayType {
       return ['token' => $this->getCSRFToken(['data' => $data, 'validFrom' => 5, 'validTo' => 120])];
     }
 
-
+    Civi::log()->debug('CoDownload inlay valid submission', ['=start' => 'CoDownload']);
     // Generate the HTML for the download activity.
     $htmlSafe = [];
     foreach ($data as $k => $v) {
@@ -99,28 +110,35 @@ HTML;
     //\CRM_Gdpr_SLA_Utils::recordSLAAcceptance($contactID);
 
     if ($this->config['followupText'] && $data['followup'] === 'Yes') {
+      $messageDetails = $this->getFollowupEmailDetails($data['reportTitle']);
+      Civi::log()->debug('Fetched message details', ['reportTitle' => $data['reportTitle'], 'messageDetails' => $messageDetails]);
+      if ($messageDetails['id']) {
+        $status = 'Scheduled';
+        $followupAlteration = '+2 months';
+        if ($data['reportTitle'] === 'Britain Talks COP26') {
+          $followupAlteration = '+5 weeks';
+        }
+        elseif ($data['reportTitle'] === 'Engaging different audiences around COP26: a guide for UK-based climate advocates') {
+          $followupAlteration = '+5 weeks';
+        }
+        elseif ($data['reportTitle'] === 'Climate Outreach - Natural England - Nature visuals') {
+          $status = 'Cancelled';
+        }
 
-      $status = 'Scheduled';
-      $followupAlteration = '+2 months';
-      if ($data['reportTitle'] === 'Britain Talks COP26') {
-        $followupAlteration = '+5 weeks';
+        $date = $this->getSuitableFollowupDate(NULL, $followupAlteration);
+        $i->addActivity([
+          'parent_id'          => $i->getContextValue(['downloadActivity', 'id']),
+          'activity_date_time' => $date,
+          'activity_type_id'   => self::ACTIVITY_TYPE_ID_FOLLOWUP,
+          'subject'            => "Follow up: " . $data['reportTitle'],
+          'status_id:name'     => $status,
+          'details'            => '<p>This scheduled activity means that on its date an automatic email will be sent to this contact to follow up on the report. Which followup gets sent depends on the configuration at the time.</p><p>You can cancel this follow up by deleting this activity.</p>',
+        ]);
       }
-      elseif ($data['reportTitle'] === 'Engaging different audiences around COP26: a guide for UK-based climate advocates') {
-        $followupAlteration = '+5 weeks';
-      }
-      elseif ($data['reportTitle'] === 'Climate Outreach - Natural England - Nature visuals') {
-        $status = 'Cancelled';
+      else {
+        \Civi::log()->debug("Configured NOT to add a followup for {reportTitle}", ['reportTitle' => $data['reportTitle']]);
       }
 
-      $date = $this->getSuitableFollowupDate(NULL, $followupAlteration);
-      $i->addActivity([
-        'parent_id'          => $i->getContextValue(['downloadActivity', 'id']),
-        'activity_date_time' => $date,
-        'activity_type_id'   => self::ACTIVITY_TYPE_ID_FOLLOWUP,
-        'subject'            => "Follow up: " . $data['reportTitle'],
-        'status_id:name'     => $status,
-        'details'            => '<p>This scheduled activity means that on its date an automatic email will be sent to this contact to follow up on the report. Which followup gets sent depends on the configuration at the time.</p><p>You can cancel this follow up by deleting this activity.</p>',
-      ]);
     }
 
     return [ 'success' => 1 ];
@@ -209,26 +227,21 @@ HTML;
   }
 
   public function sendFollowup(Array $activity, $targetContactID) {
-
-    preg_match('/^Follow up: (.*)$/', $activity['subject'], $matches);
-    $messageTemplateID = $this->config['followupMaps'][0]['messageTplID'] ?? NULL;
-    if (!$messageTemplateID) {
-      throw new \InvalidArgumentException("No default message template configured for followup report inlay");
+    if (!preg_match('/^Follow up: (.*)$/', $subject, $matches) || empty($matches[1])) {
+      Civi\log()->warning("Subject failed regex, no followup email can be sent.", ['activity' => $activity]);
+      return;
     }
-    // find the specific message tpl id, if there is one.
-    if (!empty($matches[1])) {
-      // Find the report title in the map.
-      foreach ($this->config['followupMaps'] as $item) {
-        if ($item['reportTitle'] === $matches[1]) {
-          // Found!
-          $messageTemplateID = $item['messageTplID'];
-          break;
-        }
+    // Find the report title in the map.
+    $reportTitle = $matches[1];
+    foreach ($this->config['followupMaps'] as $item) {
+      if ($item['reportTitle'] === $reportTitle) {
+        // Found!
+        $messageTemplateID = $item['messageTplID'];
+        break;
       }
     }
 
-    // Fetch the name and title of the message template. This also checks it exists.
-    $msgTpl = civicrm_api3('MessageTemplate', 'getsingle', ['return' => ['msg_title', 'msg_subject'], 'id' => $messageTemplateID]);
+    $messageDetails = $this->getFollowupEmailDetails($reportTitle);
 
     // send the email.
     // Get the From address.
@@ -260,7 +273,7 @@ HTML;
     // Load the target contact.
     $emailApiParams = [
       'create_activity' => 0,
-      'template_id'     => $messageTemplateID,
+      'template_id'     => $messageDetails['id'],
       'activity_id'     => $activity['id'],
       'contact_id'      => $targetContactID,
       'disable_smarty'  => 1,
@@ -276,14 +289,62 @@ HTML;
       'activity_id'        => $activity['id'],
       'activity_status_id' => 'Completed',
       'details'            => '<p>Sent message template titled <em>'
-        . htmlspecialchars($msgTpl['msg_title'])
+        . htmlspecialchars($messageDetails['msg_title'])
         . '</em> with subject <em>'
-        . htmlspecialchars($msgTpl['msg_subject'])
+        . htmlspecialchars($messageDetails['msg_subject'])
         . '</em> at ' . date('H:i j M Y') .  '</p>',
     ];
     civicrm_api3('Activity', 'create', $activityUpdateParams);
 
   }
+
+
+  /**
+   * Find the appropriate message template to send as a followup.
+   *
+   * @return array
+   *    Keys: ['id', 'msg_title', 'msg_subject']. 'id' will be NULL if not found, or not configured, or error.
+   *
+   */
+
+  public function getFollowupEmailDetails(string $reportTitle): array {
+    $emptyResult = [
+      'id' => NULL,
+    ];
+
+    // Check the default.
+    $messageTemplateID = $this->config['followupMaps'][0]['messageTplID'] ?? NULL;
+    if (!$messageTemplateID) {
+      Civi::log()->error("No default message template configured for followup report inlay");
+      return $emptyResult;
+    }
+
+    // find the specific message tpl id, if there is one.
+    // Find the report title in the map.
+    foreach ($this->config['followupMaps'] as $item) {
+      if ($item['reportTitle'] === $reportTitle) {
+        $messageTemplateID = $item['messageTplID'];
+        break;
+      }
+    }
+
+    // Fetch the name and title of the message template. This also checks it exists.
+    if (empty($messageTemplateID)) {
+      Civi::log()->info("Report {reportTitle} is configured NOT to send a followup", ['reportTitle' => $reportTitle]);
+      return $emptyResult;
+    }
+    try {
+      $msgTpl = civicrm_api3('MessageTemplate', 'getsingle', ['return' => ['id', 'msg_title', 'msg_subject'], 'id' => $messageTemplateID]);
+    }
+    catch (\Exception $e) {
+      Civi::log()->error("Inlay\\CoDownload failed to fetch MessageTemplate with id {id}. Perhaps it was deleted?", ['id' => $messageTemplateID]);
+      return $emptyResult;
+    }
+
+    return $msgTpl;
+  }
+
+
   /**
    * Get a date 2 months hence, but move it forward if it's a weekend or holiday. Also skip the Christmas period.
    *

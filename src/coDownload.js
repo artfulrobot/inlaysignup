@@ -80,6 +80,7 @@ import './coDownload.scss';
       const uniquePrefix = 'i' + inlay.publicID;
       var isActive = false;
       var report = { title: '', id: 0, warning: '' };
+      var nodes = {};
 
       function getFormData(token) {
         const d = {
@@ -98,11 +99,19 @@ import './coDownload.scss';
         return d;
       }
 
-
       const handleInputInterraction = (i, d) => {
         if (!isActive) {
           // First time we're moving to active.
           report.title = d.dataset.downloadTitle;
+          // Check if this report has no followup and if so, remove the followup elements.
+          // console.log({inlay});
+          if (inlay.initData.noFollowup && inlay.initData.noFollowup.includes(report.title)) {
+            // Remove followup.
+            nodes.followupContainer.style.display = 'none';
+            nodes.followup.value = 'No';
+            console.log("Removing followup texts");
+          }
+
           report.id = d.dataset.downloadId;
           report.warning = (d.dataset.downloadWarning || '').replace(/^\s*/, '').replace(/\s*$/, '');
           console.log(d);
@@ -270,7 +279,7 @@ import './coDownload.scss';
         </div>
       </div>
       `;
-      const nodes = {
+      nodes = {
         overlay: downloadAppDiv.firstElementChild,
         emailInput: downloadAppDiv.querySelector('input[name="email"]'),
         title: downloadAppDiv.querySelector('.idl-title'),
@@ -292,6 +301,7 @@ import './coDownload.scss';
         questionResponse: downloadAppDiv.querySelector('.question textarea'),
         followupLabel: downloadAppDiv.querySelector('.followup label span'),
         followup: downloadAppDiv.querySelector('.followup select'),
+        followupContainer: followup.parentElement,
       };
 
       // Set up the thanks and hide it.
