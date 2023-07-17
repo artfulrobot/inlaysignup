@@ -203,7 +203,7 @@ HTML;
         // Token failed. Issue a public friendly message, though this should
         // never be seen by anyone legit.
         // Civi::log()->notice("Token error: " . $e->getMessage . "\n" . $e->getTraceAsString());
-        watchdog('inlay', $e->getMessage() . "\n" . $e->getTraceAsString, array(), WATCHDOG_ERROR);
+        watchdog('inlay', $e->getMessage() . "\n" . $e->getTraceAsString(), array(), WATCHDOG_ERROR);
         throw new \Civi\Inlay\ApiException(400,
           ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]);
       }
@@ -227,8 +227,8 @@ HTML;
   }
 
   public function sendFollowup(Array $activity, $targetContactID) {
-    if (!preg_match('/^Follow up: (.*)$/', $subject, $matches) || empty($matches[1])) {
-      Civi\log()->warning("Subject failed regex, no followup email can be sent.", ['activity' => $activity]);
+    if (!preg_match('/^Follow up: (.*)$/', $activity['subject'], $matches) || empty($matches[1])) {
+      Civi::log()->warning("Subject failed regex, no followup email can be sent.", ['activity' => $activity]);
       return;
     }
     // Find the report title in the map.
