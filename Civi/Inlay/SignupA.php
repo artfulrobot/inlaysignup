@@ -18,6 +18,7 @@ class SignupA extends InlayType {
     'smallprintHTML'          => NULL,
     'webThanksHTML'           => NULL,
     'phoneAsk'                => TRUE,
+    'orgAsk'                  => '',
     'mailingGroup'            => NULL,
     'target'                  => NULL,
     'socials'                 => ['twitter', 'facebook', 'email', 'whatsapp'],
@@ -52,7 +53,7 @@ class SignupA extends InlayType {
       // Name of global Javascript function used to boot this app.
       'init'             => 'inlaySignupAInit',
     ];
-    foreach (['socialStyle', 'submitButtonText', 'publicTitle', 'smallprintHTML', 'webThanksHTML', 'instructionsHTML', // 'phoneAsk'
+    foreach (['socialStyle', 'submitButtonText', 'publicTitle', 'smallprintHTML', 'webThanksHTML', 'instructionsHTML', 'orgAsk', // 'phoneAsk'
       'preFormHTML', 'postFormHTML', 'newsletterLabelText'
     ] as $_) {
       $data[$_] = $this->config[$_] ?? '';
@@ -165,7 +166,11 @@ class SignupA extends InlayType {
     $valid = [];
 
     // Check we have what we need.
-    foreach (['first_name', 'last_name', 'email'] as $field) {
+    $required = ['first_name', 'last_name', 'email'];
+    if ($this->config['orgAsk']) {
+      $required[] = 'org';
+    }
+    foreach ($required as $field) {
       $val = trim($data[$field] ?? '');
       if (empty($val)) {
         $errors[] = str_replace('_', ' ', $field) . " required.";
@@ -187,12 +192,12 @@ class SignupA extends InlayType {
     Civi::log()->info('SOS SignupA ' . json_Encode(['configVal' => $this->config['newsletterLabelText'], 'data' => $data]));
     if ($this->config['newsletterLabelText']) {
       $valid['newsletterCheckbox'] = (bool) (($data['newsletterCheckbox'] ?? FALSE));
-      Civi::log()->info('SOS SignupA here');
+      // Civi::log()->info('SOS SignupA here');
     }
     else {
       // If we did not offer a checkbox, the whole form is an opt-in.
       $valid['newsletterCheckbox'] = TRUE;
-      Civi::log()->info('SOS SignupA there');
+      // Civi::log()->info('SOS SignupA there');
     }
 
     // Data is valid.

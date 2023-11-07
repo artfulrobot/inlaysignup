@@ -55,6 +55,19 @@
           />
       </div>
 
+      <div v-if="inlay.initData.orgAsk" class="isa-input-wrapper">
+        <label :for="myId + 'org'" class="text-or-email">{{inlay.initData.orgAsk}}</label>
+        <input
+          required
+          type="text"
+          :id="myId + 'org'"
+          :name="org"
+          :ref="org"
+          :disabled="$root.submissionRunning"
+          v-model="org"
+          />
+      </div>
+
       <!--
       <div v-if="inlay.initData.phoneAsk">
         <label :for="myId + 'phone'" >Phone</label>
@@ -186,6 +199,7 @@ export default {
       first_name: '',
       last_name: '',
       email: '',
+      org: '',
       phone: '',
       newsletterCheckbox: false
     };
@@ -212,6 +226,7 @@ export default {
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
+        org: this.org,
         phone: this.phone, // blank, not used
         newsletterCheckbox: this.newsletterCheckbox,
       };

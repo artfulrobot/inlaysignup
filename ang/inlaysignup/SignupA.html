@@ -33,6 +33,16 @@
         ></textarea>
     </div>
 
+    <div crm-ui-field="{name: 'inlayForm.orgAsk', title: ts('Ask for organisation? Leave blank not to ask.')}">
+      <input
+        crm-ui-id="inlayForm.orgAsk"
+        name="orgAsk"
+        ng-model="inlay.config.orgAsk"
+        class="crm-form-text"
+        placeholder="{{ts('e.g. Organisation')}}"
+        />
+    </div>
+
     <div crm-ui-field="{name: 'inlayForm.postFormHTML', title: ts('Optional text after form before newsletter checkbox')}">
       <textarea
         crm-ui-id="inlayForm.postFormHTML"
