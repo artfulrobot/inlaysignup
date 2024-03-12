@@ -139,6 +139,7 @@ class SignupA extends InlayType {
       'msg_tpl_id'         => (int) $this->config['thanksMessageTemplateID'],
       'defaultJourneyStep' => $this->config['defaultJourneyStep'] ?? '',
     ];
+    Civi::log()->info('SOS SignupA config ' . json_Encode($this->config));
     Civi::log()->info('SOS SignupA journey params ' . json_Encode($journeyParams));
     CRM_Sos_JourneyLogic::processApiRequest($journeyParams);
 

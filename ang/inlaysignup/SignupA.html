@@ -9,6 +9,7 @@
         name="name"
         ng-model="inlay.name"
         class="crm-form-text"
+        style="width: 100%"
         placeholder="{{ts('Our lovely contact form')}}"
         />
     </div>
@@ -19,6 +20,7 @@
         name="publicTitle"
         ng-model="inlay.config.publicTitle"
         class="crm-form-text"
+        style="width: 100%"
         placeholder="{{ts('e.g. Sign up now')}}"
         />
     </div>
@@ -213,9 +215,9 @@
         crm-ui-select="{allowClear:true, dropdownAutoWidth: true, select2:{}}"
         style="width: 100%"
         ng-model="inlay.config.thanksMessageTemplateID"
-        ng-options="i.msg_title + ' | ' + i.msg_subject for i in messageTpls track by i.id"
         >
         <option value="">(Do not send an email)</option>
+        <option ng-repeat="msg_tpl in messageTpls" value="{{msg_tpl.id}}" >{{msg_tpl.msg_title}} | {{msg_tpl.msg_subject}}</option>
       </select>
     </div>
 
