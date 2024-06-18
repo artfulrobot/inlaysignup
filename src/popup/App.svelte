@@ -37,19 +37,19 @@
       if (!hasScrolledDown) {
         const vh = Math.max(
           document.documentElement.clientHeight || 0,
-          window.innerHeight || 0
+          window.innerHeight || 0,
         );
 
         if (
           Math.floor(
-            (windowScrollY / (document.body.scrollHeight - vh)) * 100
+            (windowScrollY / (document.body.scrollHeight - vh)) * 100,
           ) >= inlay.initData.minScrollPercent
         ) {
           hasScrolledDown = true;
           debug(
             "inlaysignup: scrolled at least",
             inlay.initData.minScrollPercent,
-            "%"
+            "%",
           );
         }
         lastScrollY = windowScrollY;
@@ -112,7 +112,9 @@
     if (!CookieService.getCookie("declinedSignup")) {
       document.addEventListener("mouseout", mouseOut);
     } else {
-      console.info("We will not offer you a signup pop-up because you have previously declined. Unset your declinedSignup cookie to reset this.");
+      console.info(
+        "We will not offer you a signup pop-up because you have previously declined. Unset your declinedSignup cookie to reset this.",
+      );
       dismissedPopup = true;
     }
 
@@ -133,14 +135,14 @@
     console.info(
       "Signup pop-up dismissed. We have set a cookie 'declinedSignup' which means we won't bother you with it again for " +
         inlay.initData.cookieExpiryDays +
-        " days."
+        " days.",
     );
     document.removeEventListener("mouseout", mouseOut);
     // Now we have shown the popup, don't show it again for cookieExpiryDays days.
     CookieService.setCookie(
       "declinedSignup",
       true,
-      inlay.initData.cookieExpiryDays
+      inlay.initData.cookieExpiryDays,
     );
   }
 
@@ -193,12 +195,12 @@
           console.info(
             "We have set a cookie 'declinedSignup' which means we won't bother you with the pop-up again. The cookie expires in " +
               inlay.initData.cookieExpiryDays +
-              " days."
+              " days.",
           );
           CookieService.setCookie(
             "declinedSignup",
             true,
-            inlay.initData.cookieExpiryDays
+            inlay.initData.cookieExpiryDays,
           );
 
           // Allow others to take action, e.g. for analytics.
@@ -208,7 +210,7 @@
         } else {
           alert(
             "Sorry, there was a problem with the form: " +
-              (r.error || "unknown error")
+              (r.error || "unknown error"),
           );
           cancelSubmission();
           return;
@@ -316,12 +318,14 @@
   .inlay-signup-overlay {
     border: none;
     opacity: 0;
-    width: 23rem;
+    max-width: 23rem;
     max-height: 100vh;
     overflow-y: auto;
     background: white;
     transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s linear;
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.2s linear;
     padding: 1rem;
   }
   .inlay-signup-overlay.popup {
