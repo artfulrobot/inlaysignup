@@ -17,16 +17,27 @@ Add the Inlay's `<script>` tag on the pages you need it on the website. **Also**
 >You need javascript enabled to access this</noscript>
 ```
 
-The actual download must be a publicly accessible URL on your website at `/download/{downloadID}`. In this regard, this Inlay is not suitable for protecting *sensitive* data, since it's easy for someone to look at how it works and get the download without supplying info.
+The actual download must be a publicly accessible URL on your website at `/download/{downloadID}`. In this regard, this Inlay is not suitable for protecting _sensitive_ data, since it's easy for someone to look at how it works and get the download without supplying info.
 
 The download-warning is optional.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
+## Configuration
+
+"Follow up" is supported as follows:
+
+- Provide "May we follow up..." wording
+- Enter a tuple of the report title (exact match required) and an email template
+  to send that email to people downloading that report.
+- There's a `(Default)` report with default follow up email - can be blank
+  meaning: do not send a followup email. If the report title does not match the
+  specified ones, this is what gets used.
+
 ## Requirements
 
-* PHP v7.0+
-* CiviCRM (*FIXME: Version number*)
+- PHP v7.0+
+- CiviCRM (_FIXME: Version number_)
 
 ## Installation (Web UI)
 
@@ -54,8 +65,8 @@ cv en inlaysignup
 
 ## Usage
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
+(_ FIXME: Where would a new user navigate to get started? What changes would they see? _)
 
 ## Known Issues
 
-(* FIXME *)
+(_ FIXME _)

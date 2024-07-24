@@ -41,11 +41,15 @@ class CoDownload extends InlayType {
     // Export a list of report titles that do not send followups.
 
     $noFollowup = [];
-    foreach ($this->config['followupMaps'] as $item) {
-      if (empty($item['messageTplID'])) {
-        $noFollowup[] = $item['reportTitle'];
-      }
-    }
+    // 2024-06-04 commented this, meaning all reports ask the followup
+    // question; the answer is stored in a field. It does not mean an email is
+    // always sent.
+    //
+    // foreach ($this->config['followupMaps'] as $item) {
+    //   if (empty($item['messageTplID'])) {
+    //     $noFollowup[] = $item['reportTitle'];
+    //   }
+    // }
 
     return [
       // Name of global Javascript function used to boot this app.
@@ -94,17 +98,23 @@ class CoDownload extends InlayType {
       <p>$htmlSafe[first_name] $htmlSafe[last_name] $htmlSafe[email] downloaded from <a href="$htmlSafe[location]" >$htmlSafe[location]</a> <em>$htmlSafe[organisation]</em></p>
       $config[questionText]
       <blockquote>$htmlSafe[questionResponse]</blockquote>
-      $config[followupText]
-      <p>They chose: <em>$htmlSafe[followup]</em></p>
-HTML;
+      HTML;
+    if ($this->config['followupText']) {
+      $details .= <<<HTML
+        $config[followupText]
+        <p>They chose: <em>$htmlSafe[followup]</em></p>
+        HTML;
+    }
 
     $i = \Civi\LocalFluentImport::ofClean($data);
     $i->getOrCreateContact(['first_name', 'last_name', 'email']);
     $i->ifClean('organisation')->updateContact(['Individuals_details.Declared_Organisation' => $i->getCleanValue('organisation')]);
+    $mayFollowUp = $this->config['followupText'] && $data['followup'] === 'Yes';
     $i->addActivity([
       'activity_type_id'  => self::ACTIVITY_TYPE_ID_DOWNLOAD,
       'subject'           => $data['reportTitle'],
       'details'           => $details,
+      'Download_from_website.May_follow_up' => $mayFollowUp,
     ], 'downloadActivity');
 
     //\CRM_Gdpr_SLA_Utils::recordSLAAcceptance($contactID);

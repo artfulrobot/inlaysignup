@@ -101,10 +101,8 @@
               >
             <option value="">(do not send a followup)</option>
             </select>
+            <p>Whether they said yes or no to the followup is recorded as in the <em>May follow-up</em> field. This will be <em>No</em> if you didn't ask the question.</p>
         </label>
-        <div ng-show="i === 0 && (!row.messageTplID) && inlay.config.followupText.length > 0" class="crm-message crm-error error message">
-          As you have specified follow up text, you must choose the default message template.
-        </div>
         <div>
           <a ng-if="i > 0" href ng-click="inlay.config.followupMaps.splice(i, 1)">Delete</a>
         </div>
