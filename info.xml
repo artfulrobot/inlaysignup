@@ -18,7 +18,7 @@
   <version>1.0</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>5.0</ver>
+    <ver>5.27</ver>
   </compatibility>
   <requires>
     <ext>de.systopia.xcm</ext>
@@ -26,8 +26,13 @@
   <comments>Example signup forms for use with CiviCRM Inlay module https://civicrm.org/extensions/inlay</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
+    <psr0 prefix="CRM_" path="."/>
   </classloader>
   <civix>
     <namespace>CRM/Inlaysignup</namespace>
+    <format>23.02.1</format>
   </civix>
+  <mixins>
+    <mixin>ang-php@1.0.0</mixin>
+  </mixins>
 </extension>
