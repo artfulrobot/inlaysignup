@@ -3,7 +3,6 @@
 namespace Civi\Inlay;
 
 use Civi\Inlay\Type as InlayType;
-use Civi\Inlay\ApiRequest;
 use Civi;
 use CRM_Inlaysignup_ExtensionUtil as E;
 
@@ -92,6 +91,7 @@ class InlaySignup extends InlayType {
         'addContactToGroup'   => [$this, 'addContactToGroup'],
         'sendWelcomeEmail'    => [$this, 'sendWelcomeEmail'],
       ],
+      'inlay' => $this,
     ]);
     // Allow extensions to alter the processing chain.
     // They may completely change $event->chain, e.g.
@@ -137,6 +137,8 @@ class InlaySignup extends InlayType {
       $valid['source'] = '';
       $errors[] = "Invalid request (this should not happen) SRC1";
     }
+    // Store raw source in case useful.
+    $valid['sourceRaw'] = $data['source'] ?? '';
 
     if ($errors) {
       throw new \Civi\Inlay\ApiException(400, ['error' => implode(', ', $errors)]);
@@ -164,6 +166,8 @@ class InlaySignup extends InlayType {
 
   /**
    * Default find-or-create functionality.
+   *
+   * Sets $data['contactID']
    */
   public function findOrCreateWithXCM(array &$data) {
     $params = $data + ['contact_type' => 'Individual'];
@@ -243,7 +247,7 @@ class InlaySignup extends InlayType {
       }
       Civi::log()->error($error);
 
-      $details = "<p>Message failed to send - see Sos error log. Exception: " . htmlspecialchars($e->getMessage()) . "</p>";
+      $details = "<p>Message failed to send - see error log. Exception: " . htmlspecialchars($e->getMessage()) . "</p>";
       $status = 'Cancelled';
     }
 
@@ -277,4 +281,5 @@ class InlaySignup extends InlayType {
   public function getExternalScript(): string {
     return file_get_contents(E::path('dist/inlay-signup-popup.js'));
   }
+
 }

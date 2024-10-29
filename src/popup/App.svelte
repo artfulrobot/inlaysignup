@@ -19,7 +19,6 @@
     last_name,
     email,
     // Internals
-    form,
     busy = false,
     progress,
     pageLoadedTime,
@@ -231,7 +230,7 @@
   <article>
     <h1>{title}</h1>
     <button on:click|preventDefault={dismissed} class="dismiss" title="Close"
-      >✕</button
+      ><span aria-hidden >X</span></button
     >
     {#if state === "popup"}
       <form on:submit|preventDefault={handleSubmit}>
