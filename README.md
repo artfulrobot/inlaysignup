@@ -25,3 +25,9 @@ modifying the `$event->chain` which contains callbacks.
 
 On successful submission, an `InlaySignupCompleted` event is dispatched on the `document` node. You may want to `document.addEventListener('InlaySignupCompleted', yourHanderFunction)` to, for example, send analytics if the user has opted-in.
 
+## Changes
+
+- v1.3
+  - Replace the unicode charcter with a plain old X and mark it aria-hidden
+  - pass the inlay object to the hookable chain.
+- v1.2

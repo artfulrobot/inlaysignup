@@ -122,10 +122,12 @@ class InlaySignup extends InlayType {
       $val = trim($data[$field] ?? '');
       if (empty($val)) {
         $errors[] = str_replace('_', ' ', $field) . " required.";
-      } else {
+      }
+      else {
         if ($field === 'email' && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
           $errors[] = "invalid email address";
-        } else {
+        }
+        else {
           $valid[$field] = $val;
         }
       }
@@ -150,14 +152,15 @@ class InlaySignup extends InlayType {
       try {
         $this->checkCSRFToken($data['token'], $valid);
         $valid['token'] = TRUE;
-      } catch (\InvalidArgumentException $e) {
+      }
+      catch (\InvalidArgumentException $e) {
         // Token failed. Issue a public friendly message, though this should
         // never be seen by anyone legit.
         Civi::log()->notice("Token error: " . $e->getMessage . "\n" . $e->getTraceAsString());
         throw new \Civi\Inlay\ApiException(
           400,
           ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]
-        );
+              );
       }
     }
 
@@ -235,13 +238,15 @@ class InlaySignup extends InlayType {
         Civi::log()->warning("Mail disabled. Otherwise would send mailing $template[id]");
         $details = "Message NOT sent: mailer backend is disabled - eg. development mode";
         $status = 'Cancelled';
-      } else {
+      }
+      else {
         civicrm_api3('MessageTemplate', 'send', $msgTplSendParams);
         $details = "<p>Message successfully sent</p>";
         $status = 'Completed';
       }
-    } catch (\Exception $e) {
-      $error = __CLASS__ . "::" . __FUNCTION__ . ":ERROR: failed to send mailing. Error:"  . $e->getMessage();
+    }
+    catch (\Exception $e) {
+      $error = __CLASS__ . "::" . __FUNCTION__ . ":ERROR: failed to send mailing. Error:" . $e->getMessage();
       if (isset($msgTplSendParams)) {
         $error .= " MessageTemplate.send params were: " . json_encode($msgTplSendParams);
       }
