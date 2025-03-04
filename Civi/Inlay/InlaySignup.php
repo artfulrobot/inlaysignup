@@ -156,7 +156,7 @@ class InlaySignup extends InlayType {
       catch (\InvalidArgumentException $e) {
         // Token failed. Issue a public friendly message, though this should
         // never be seen by anyone legit.
-        Civi::log()->notice("Token error: " . $e->getMessage . "\n" . $e->getTraceAsString());
+        Civi::log()->notice("Token error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
         throw new \Civi\Inlay\ApiException(
           400,
           ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]
