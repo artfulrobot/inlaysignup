@@ -110,6 +110,13 @@ class InlaySignup extends InlayType {
   /**
    * Validate and clean up input data.
    *
+   * Data array includes
+   *
+   * - first_name
+   * - last_name
+   * - email
+   * - source (URL of page inlay is on)
+   *
    * @param array $data
    *
    * @return array

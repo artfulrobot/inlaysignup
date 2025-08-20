@@ -203,7 +203,11 @@
           );
 
           // Allow others to take action, e.g. for analytics.
-          let e = new Event("InlaySignupComplete");
+          let e = new CustomEvent("InlaySignupComplete", {
+            details: { inlay, publicTitle: inlay.publicTitle },
+            bubbles: true }
+            );
+          // backwards compat
           e.inlay = inlay;
           document.dispatchEvent(e);
         } else {
