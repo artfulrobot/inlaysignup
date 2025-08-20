@@ -204,12 +204,12 @@
 
           // Allow others to take action, e.g. for analytics.
           let e = new CustomEvent("InlaySignupComplete", {
-            details: { inlay, publicTitle: inlay.publicTitle },
-            bubbles: true }
-            );
+            detail: { inlay, publicTitle: inlay.initData.title },
+            bubbles: true });
           // backwards compat
           e.inlay = inlay;
-          document.dispatchEvent(e);
+          CiviCRMInlay.debug("Dispatching InlaySignupComplete on document", e);
+          document.body.dispatchEvent(e);
         } else {
           alert(
             "Sorry, there was a problem with the form: " +
