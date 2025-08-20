@@ -27,6 +27,9 @@ On successful submission, an `InlaySignupCompleted` event is dispatched on the `
 
 ## Changes
 
+- v1.4
+  - dispatch a CustomEvent not an Event, and include `publicTitle` (and `inlay`) 
+    in the `event.details` prop. For analytics
 - v1.3
   - Replace the unicode charcter with a plain old X and mark it aria-hidden
   - pass the inlay object to the hookable chain.
