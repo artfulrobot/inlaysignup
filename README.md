@@ -1,15 +1,20 @@
 # inlaysignup
 
-![Screenshot](/images/screenshot.png)
+An embeddable sign up form for CiviCRM useing Inlay.
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+**This 'main' branch is not used.** This is because [InlayPetition](https://codeberg.org/artfulrobot/inlaypetition/) does a better job (despite its name) for most purposes.
+
+However, **please see the "simplest" branch** which provides one of those annoying pop-up newsletter-signup forms that appear when you've been on a website for a while, as this *is* in active use.
+https://github.com/artfulrobot/inlaysignup/blob/simplest/README.md
+
+
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
-* PHP v7.0+
-* CiviCRM (*FIXME: Version number*)
+* PHP v8.0+
+* CiviCRM 6.5+
 
 ## Installation (Web UI)
 
