@@ -4,6 +4,7 @@ namespace Civi\Inlay;
 
 use Civi\Inlay\Type as InlayType;
 use Civi;
+use Civi\Api4\Activity;
 use CRM_Inlaysignup_ExtensionUtil as E;
 
 class InlaySignup extends InlayType {
@@ -85,11 +86,11 @@ class InlaySignup extends InlayType {
     $event = \Civi\Core\Event\GenericHookEvent::create([
       'chain' => [
         // The following must set contactID on the data array
-        'findOrCreate'        => [$this, 'findOrCreateWithXCM'],
-
-        'setBulkOnGivenEmail' => [$this, 'setBulkOnGivenEmail'],
-        'addContactToGroup'   => [$this, 'addContactToGroup'],
-        'sendWelcomeEmail'    => [$this, 'sendWelcomeEmail'],
+        'findOrCreate'                => [$this, 'findOrCreateWithXCM'],
+        'setBulkOnGivenEmail'         => [$this, 'setBulkOnGivenEmail'],
+        'addContactToGroup'           => [$this, 'addContactToGroup'],
+        'recordInlayPetitionActivity' => [$this, 'recordInlayPetitionActivity'],
+        'sendWelcomeEmail'            => [$this, 'sendWelcomeEmail'],
       ],
       'inlay' => $this,
     ]);
@@ -200,13 +201,81 @@ class InlaySignup extends InlayType {
       ->execute();
   }
 
-  public function addContactToGroup($data) {
+  public function addContactToGroup(&$data) {
     $groupID = $this->config['mailingGroup'];
-    if ($groupID) {
-      $contactIDs = [$data['contactID']];
-      // list($total, $added, $notAdded) = \CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID, 'Web', 'Added');
-      \CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID, 'Web', 'Added');
+    if (!$groupID) {
+      Civi::log()->error("InlaySignup #{$this->getID()} '{$this->getName()}' needs mailing group configuring.");
+      return;
     }
+
+    // Are they already in the group?
+    $isInGroup = \Civi\Api4\GroupContact::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('group_id', '=', $this->config['mailingGroup'])
+      ->addWhere('contact_id', '=', $data['contactID'])
+      ->addWhere('status', '=', 'Added')
+      ->execute()->count() > 0;
+
+
+    // Ensure contact is in the group.
+    $data['wasAlreadyInGroup'] = $isInGroup;
+    $contactIDs = [$data['contactID']];
+    \CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID, 'Web', 'Added');
+
+  }
+
+  /**
+   * InlayPetition is another inlay that includes a signup form.
+   *
+   * If this is installed, we re-use it's activity type to record our signup,
+   * which makes it much easier to see how people signed up where both inlay
+   * types are in use. 
+   *
+   * If InlayPetition is not installed, this does nothing.
+   *
+   * Technically we don't care if it's installed, we just care if its activity type
+   * is present.
+   *
+   * If it adds an activity, it puts the new activity ID in $data[activityAdded].
+   *
+   */
+  public function recordInlayPetitionActivity(&$data) {
+
+    $activityTypeID = \Civi\Api4\OptionValue::get(false)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'activity_type')
+      ->addWhere('name', '=', 'inlay_petition')
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first()['value'] ?? 0;
+
+    if (!$activityTypeID) {
+      return;
+    }
+
+    // Also check for the custom field.
+    $signerOptIn = \Civi\Api4\CustomField::get(false)
+      ->setUseCache(TRUE)
+      ->addWhere('custom_group_id:name', '=', 'inlaypetition_signer')
+      ->addWhere('name', '=', 'inlaypetition_signer_optin')
+      ->execute()->first()['name'] ?? '';
+
+
+    // Write an activity. Calculate the subject here as we need it in a few places.
+    $values = [
+      'activity_type_id'  => $activityTypeID,
+      'target_contact_id' => $data['contactID'],
+      'subject'           => $this->getName() . ' [inlaysignup]',
+      'status_id:name'    => 'Completed',
+      'source_contact_id' => $data['contactID'],
+      'location'          => $data['source'] ?? '',
+    ];
+
+    if ($signerOptIn) {
+      $values['inlaypetition_signer.inlaypetition_signer_optin'] = ($data['wasAlreadyInGroup'] ?? FALSE)
+        ? 'yes_in_already' : 'yes_added' ;
+    }
+
+    $data['activityAdded'] = Activity::create(FALSE)->setValues($values)->execute()->first()['id'];
   }
 
   public function sendWelcomeEmail(array $data) {
