@@ -2,6 +2,7 @@
 import "./coDownload.scss";
 
 (() => {
+  console.log('v2');
   let langMap = null;
 
   let ende = {
@@ -93,6 +94,7 @@ import "./coDownload.scss";
           organisation: nodes.orgInput.value,
           location: window.location.href,
           reportTitle: report.title,
+          reportId: report.id,
           questionResponse: nodes.questionResponse.value,
           followup: nodes.followup.value,
         };
@@ -495,11 +497,9 @@ import "./coDownload.scss";
                       nodes.form.style.display = "none";
                       nodes.thanks.style.display = "";
                       // Redirect browser to the download page.
-                      nodes.downloadLink.setAttribute(
-                        "href",
-                        "/download/" + report.id
-                      );
-                      window.location = "/download/" + report.id;
+                      const downloadUrl = "/download/" + report.id + "?authToken=" + encodeURIComponent(r.authToken ?? '');
+                      nodes.downloadLink.setAttribute("href", downloadUrl);
+                      window.location = downloadUrl;
                     } else {
                       alert(
                         ts("Sorry, there was a problem with the form") +

@@ -3,14 +3,13 @@
 namespace Civi\Inlay;
 
 use Civi\Inlay\Type as InlayType;
-use Civi\Inlay\ApiRequest;
 use Civi;
 use CRM_Inlaysignup_ExtensionUtil as E;
 
 class CoDownload extends InlayType {
 
-  const ACTIVITY_TYPE_ID_DOWNLOAD=56;
-  const ACTIVITY_TYPE_ID_FOLLOWUP=90;
+  const ACTIVITY_TYPE_ID_DOWNLOAD = 56;
+  const ACTIVITY_TYPE_ID_FOLLOWUP = 90;
 
   public static $typeName = 'Datawalled Download';
 
@@ -151,7 +150,14 @@ class CoDownload extends InlayType {
 
     }
 
-    return [ 'success' => 1 ];
+    // Generate a token for the website to confirm this download request is legit.
+    $downloadID = $data['reportId'];
+    $exp = time() + 60 * 5;
+    $salt = bin2hex(random_bytes(4));
+    $authToken = $exp . '-' . $salt . '-'
+      . hash_hmac('sha256', "$exp$salt$downloadID", CO_WEBSITE_DOWNLOAD_KEY);
+
+    return ['success' => 1, 'authToken' => $authToken];
   }
 
   /**
@@ -165,6 +171,7 @@ class CoDownload extends InlayType {
    * - followup
    * - location
    * - reportTitle
+   * - reportId (int)
    * - organisation (optional)
    * - token (sent on 2nd request, for validation)
    *
@@ -185,6 +192,9 @@ class CoDownload extends InlayType {
         if ($field === 'email' && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
           // xxx ts
           $errors[] = "invalid email address";
+        }
+        if ($field === 'reportId' && ctype_digit($val)) {
+          $valid[$field] = (int) $val;
         }
         else {
           $valid[$field] = $val;
@@ -218,7 +228,6 @@ class CoDownload extends InlayType {
           ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]);
       }
     }
-
 
     // Civi::log()->info("valid data received:" . json_encode($valid));
     return $valid;
@@ -299,24 +308,22 @@ class CoDownload extends InlayType {
       'activity_id'        => $activity['id'],
       'activity_status_id' => 'Completed',
       'details'            => '<p>Sent message template titled <em>'
-        . htmlspecialchars($messageDetails['msg_title'])
-        . '</em> with subject <em>'
-        . htmlspecialchars($messageDetails['msg_subject'])
-        . '</em> at ' . date('H:i j M Y') .  '</p>',
+      . htmlspecialchars($messageDetails['msg_title'])
+      . '</em> with subject <em>'
+      . htmlspecialchars($messageDetails['msg_subject'])
+      . '</em> at ' . date('H:i j M Y') . '</p>',
     ];
     civicrm_api3('Activity', 'create', $activityUpdateParams);
 
   }
 
-
   /**
    * Find the appropriate message template to send as a followup.
    *
    * @return array
-   *    Keys: ['id', 'msg_title', 'msg_subject']. 'id' will be NULL if not found, or not configured, or error.
+   *   Keys: ['id', 'msg_title', 'msg_subject']. 'id' will be NULL if not found, or not configured, or error.
    *
    */
-
   public function getFollowupEmailDetails(string $reportTitle): array {
     $emptyResult = [
       'id' => NULL,
@@ -354,19 +361,19 @@ class CoDownload extends InlayType {
     return $msgTpl;
   }
 
-
   /**
    * Get a date 2 months hence, but move it forward if it's a weekend or holiday. Also skip the Christmas period.
    *
    * @return ?string parsable date string or NULL for now
    * @return string date in Y-m-d format
    */
-  public function getSuitableFollowupDate($from=NULL, string $followupAlteration = '+2 months') {
+  public function getSuitableFollowupDate($from = NULL, string $followupAlteration = '+2 months') {
     if ($from === NULL) {
       $from = 'today';
     }
     $cache = \CRM_Utils_Cache::create(['type' => ['SqlGroup'], 'name' => 'codownload']);
-    $bankHolls = $cache->get('bankHolls', NULL); // Will return default if cached value expired.
+    // Will return default if cached value expired.
+    $bankHolls = $cache->get('bankHolls', NULL);
     if (!$bankHolls) {
       $data = json_decode(file_get_contents('https://www.gov.uk/bank-holidays.json'), TRUE);
       if ($data) {
@@ -378,7 +385,8 @@ class CoDownload extends InlayType {
           }
         }
         // cache for a month.
-        $cache->set('bankHolls', $bankHolls, new \DateInterval('P1M')); // Keep value for 1 month.
+        // Keep value for 1 month.
+        $cache->set('bankHolls', $bankHolls, new \DateInterval('P1M'));
       }
     }
 
@@ -400,4 +408,5 @@ class CoDownload extends InlayType {
     }
     return $d->format('Y-m-d 10:00:00');
   }
+
 }
