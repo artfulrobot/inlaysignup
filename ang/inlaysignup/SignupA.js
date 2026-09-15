@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('inlaysignup').config(function($routeProvider) {
       $routeProvider.when('/inlays/signupA/:id', {
@@ -108,4 +108,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
