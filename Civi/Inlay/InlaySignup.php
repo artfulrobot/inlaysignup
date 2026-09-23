@@ -157,7 +157,7 @@ class InlaySignup extends InlayType {
         // Token failed. Issue a public friendly message, though this should
         // never be seen by anyone legit.
         Civi::log()->notice("Token error: " . $e->getMessage . "\n" . $e->getTraceAsString());
-        watchdog('inlay', $e->getMessage() . "\n" . $e->getTraceAsString, array(), WATCHDOG_ERROR);
+        watchdog('inlay', $e->getMessage() . "\n" . $e->getTraceAsString, [], WATCHDOG_ERROR);
         throw new \Civi\Inlay\ApiException(400,
           ['error' => "Mysterious problem, sorry! Code " . substr($e->getMessage(), 0, 3)]);
       }
