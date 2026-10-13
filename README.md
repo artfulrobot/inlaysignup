@@ -2,13 +2,15 @@
 
 Makes a pop-up signup form appear after a bit of time on the page followed by an indication of wanting to leave the page.
 
+**NOTICE** _This 'main' branch is now what used to be the 'simplest' branch. If you're looking for the code for the old main branch, you'll find it on a branch called old-main._
+
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
-* PHP v8.3
-* CiviCRM 6.8+
-* Inlay 1.4+
+- PHP v8.3
+- CiviCRM 6.8+
+- Inlay 1.4+
 
 ## Brief how-to
 
@@ -28,19 +30,20 @@ On successful submission, an `InlaySignupCompleted` event is dispatched on the `
 ## Changes
 
 - v1.4.1
-  - Integration with [Inlay 
+
+  - Integration with [Inlay
     Petition](https://codeberg.org/artfulrobot/inlaypetition) (if you are not using that, it makes no difference.)
     That inlay also includes a (non-pop-up) signup form that works very similarly.
-    If Inlay Petition is installed then *this* Inlay will piggy-back its activity
+    If Inlay Petition is installed then _this_ Inlay will piggy-back its activity
     type to record a "signed petition" activity. The subject is set to the name
-    of the inlay plus ` [inlaysignup]` so you know where it came from. This makes it
+    of the inlay plus `[inlaysignup]` so you know where it came from. This makes it
     easy to view or summarise where your signups come from across both pop-up and
     inlaypetition. It also populates that activity's opt-in field which will say
     whether the person was already in the group or not (often people forget they're
     signed up and do it again).
 
 - v1.4
-  - Dispatch a CustomEvent not an Event in Javascript, and include `publicTitle` 
+  - Dispatch a CustomEvent not an Event in Javascript, and include `publicTitle`
     (and `inlay`) in the `event.details` prop. For analytics
 - v1.3
   - Replace the unicode charcter with a plain old X and mark it aria-hidden
