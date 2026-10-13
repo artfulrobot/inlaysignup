@@ -181,7 +181,7 @@ class InlaySignup extends InlayType {
    * Sets $data['contactID']
    */
   public function findOrCreateWithXCM(array &$data) {
-    $params = $data + ['contact_type' => 'Individual'];
+    $params = $data + ['contact_type' => 'Individual', 'source' => 'Signup: ' . $this->getName()];
     $contactID = civicrm_api3('Contact', 'getorcreate', $params)['id'] ?? NULL;
     if (!$contactID) {
       Civi::log()->error('Failed to getorcreate contact with params: ' . json_encode($params));
